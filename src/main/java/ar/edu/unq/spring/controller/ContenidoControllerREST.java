@@ -2,10 +2,13 @@ package ar.edu.unq.spring.controller;
 
 import ar.edu.unq.spring.controller.dto.ContenidoBodyDTO;
 import ar.edu.unq.spring.controller.dto.ContenidoResponseDTO;
+import ar.edu.unq.spring.controller.dto.PageContenidoDTO;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.exception.ContenidoNoEncontradoException;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,5 +52,12 @@ public class ContenidoControllerREST {
         var contenido = contenidoService.recuperar(id)
                 .orElseThrow(ContenidoNoEncontradoException::new);
         contenidoService.eliminar(contenido);
+    }
+
+    @GetMapping("/search")
+    public PageContenidoDTO searchContenido(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorNombre(nombre, nroPagina-1, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
     }
 }
