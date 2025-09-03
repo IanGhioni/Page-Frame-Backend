@@ -1,11 +1,13 @@
 package ar.edu.unq.spring.modelo;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.Constraint;
+import jakarta.validation.constraints.*;
 import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Year;
 
 @ToString
 @Setter
@@ -39,9 +41,11 @@ public class Contenido {
     private String autores;
 
     @Column(nullable = false)
+    @Min(value = 1450)
+    @Max(value = 2026)
     private int publicacion;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 4096)
     @NotBlank(message = "La descripción es obligatoria")
     private String descripcion;
 
