@@ -34,6 +34,10 @@ public class Contenido {
     private String titulo;
 
     @Column(nullable = false)
+    @NotBlank(message = "El campo autores es obligatorio")
+    private String autores;
+
+    @Column(nullable = false)
     private int publicacion;
 
     @Column(nullable = false)
@@ -54,11 +58,12 @@ public class Contenido {
     @Column(nullable = false)
     private int largo;
 
-    public Contenido(String isbn, String imagen, String titulo, int publicacion, String descripcion,
+    public Contenido(String isbn, String imagen, String titulo, String autores, int publicacion, String descripcion,
             String categoria, double ratingCount, double ratingAverage, int largo) {
         this.isbn = isbn;
         this.imagen = imagen;
         this.titulo = titulo;
+        this.autores = autores;
         this.publicacion = publicacion;
         this.descripcion = descripcion;
         this.categoria = categoria;

@@ -35,6 +35,16 @@ public class ContenidoServiceImpl implements ContenidoService {
     }
 
     @Override
+    public List<Contenido> recuperarTodoOrdenadoPorTituloAsc() {
+        return this.contenidoDAO.contenidoOrdPorTituloAsc();
+    }
+
+    @Override
+    public List<Contenido> recuperarTodoOrdenadoPorAutoresAsc() {
+        return this.contenidoDAO.contenidoOrdPorAutoresAsc();
+    }
+
+    @Override
     public void actualizar(Contenido contenido) {
         if (contenido.getId() == null) {
             throw new ContenidoNoEncontradoException();

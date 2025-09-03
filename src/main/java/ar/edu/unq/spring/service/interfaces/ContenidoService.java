@@ -9,6 +9,8 @@ public interface ContenidoService {
     Contenido crear(Contenido contenido);
     Optional<Contenido> recuperar(Long contenidoId);
     List<Contenido> recuperarTodos();
+    List<Contenido> recuperarTodoOrdenadoPorTituloAsc();
+    List<Contenido> recuperarTodoOrdenadoPorAutoresAsc();
     void actualizar(Contenido contenido);
     void eliminar(Contenido contenido);
 }
