@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/contenido")
+@CrossOrigin("http://localhost:5173")
 public class ContenidoControllerREST {
     public final ContenidoService contenidoService;
 
