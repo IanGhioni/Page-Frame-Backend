@@ -27,6 +27,7 @@ public class Contenido {
             regexp = "^(https?|ftp)://.*$",
             message = "La imagen debe ser una URL válida"
     )
+    @NotBlank(message = "Debe proporcionar una URL de imagen")
     private String imagen;
 
     @Column(nullable = false)
