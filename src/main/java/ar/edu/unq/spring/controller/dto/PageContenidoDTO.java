@@ -7,13 +7,15 @@ import java.util.List;
 
 public record PageContenidoDTO(List<Contenido> resultados,
                                int numeroDePagina,
-                               int totalDePaginas) {
+                               int totalDePaginas,
+                               int totalDeElementos) {
 
     public static PageContenidoDTO converter(Page<Contenido> page) {
         return new PageContenidoDTO(
                 page.getContent(),
-                page.getNumber()+1,
-                page.getTotalPages()
+                page.getNumber(),
+                page.getTotalPages(),
+                (int) page.getTotalElements()
         );
     }
 }

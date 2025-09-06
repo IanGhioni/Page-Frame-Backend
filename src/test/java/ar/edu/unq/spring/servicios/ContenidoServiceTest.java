@@ -209,6 +209,6 @@ public class ContenidoServiceTest {
 
     @AfterEach
     void cleanUp() {
-        testService.cleanUp();
+        //testService.cleanUp();
     }
 }

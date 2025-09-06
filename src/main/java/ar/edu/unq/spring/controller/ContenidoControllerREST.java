@@ -56,7 +56,7 @@ public class ContenidoControllerREST {
 
     @GetMapping("/search")
     public PageContenidoDTO searchContenido(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
-        Page<Contenido> p = contenidoService.recuperarPorNombre(nombre, nroPagina-1, tamanioPagina);
+        Page<Contenido> p = contenidoService.recuperarPorNombre(nombre, nroPagina, tamanioPagina);
         PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
         return pDTO;
     }
