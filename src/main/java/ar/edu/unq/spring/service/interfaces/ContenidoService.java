@@ -1,6 +1,8 @@
 package ar.edu.unq.spring.service.interfaces;
 
 import ar.edu.unq.spring.modelo.Contenido;
+import ar.edu.unq.spring.modelo.ContenidoPaginado;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,4 +15,6 @@ public interface ContenidoService {
     List<Contenido> recuperarTodoOrdenadoPorAutoresAsc();
     void actualizar(Contenido contenido);
     void eliminar(Contenido contenido);
+
+    Page<Contenido> recuperarPorNombre(String nombre, int pagina, int tamanioPorPagina);
 }
