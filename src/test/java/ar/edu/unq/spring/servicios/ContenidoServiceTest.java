@@ -158,6 +158,7 @@ public class ContenidoServiceTest {
         Page<Contenido> p = contenidoService.recuperarPorNombre("War",0,2);
 
         assertEquals(2, p.get().toList().size());
+        assertTrue(p.get().toList().get(0).getRatingCount()>p.get().toList().get(1).getRatingCount());
     }
 
     @Test
@@ -174,41 +175,71 @@ public class ContenidoServiceTest {
         poblarBaseParaBusquedaPorNombre();
 
         assertThrows(TamanioDePaginaInvalidoException.class, () ->
-                contenidoService.recuperarPorNombre("War",1,0)
+                contenidoService.explorarContenidoPopular(1,0)
+        );
+    }
+
+    @Test
+    void testExplorarPaginado() {
+        poblarBaseParaBusquedaPorNombre();
+
+        Page<Contenido> p = contenidoService.explorarContenidoPopular(0,2);
+
+        assertEquals(2, p.get().toList().size());
+        assertTrue(p.get().toList().get(0).getRatingCount()>p.get().toList().get(1).getRatingCount());
+    }
+
+    @Test
+    void testExplorarPaginadoNumeroDePaginaInvalido() {
+        poblarBaseParaBusquedaPorNombre();
+
+        assertThrows(NroDePaginaInvalidoException.class, () ->
+                contenidoService.explorarContenidoPopular(-1,2)
+        );
+    }
+
+    @Test
+    void testExplorarPaginadoTamanioDePaginaInvalido() {
+        poblarBaseParaBusquedaPorNombre();
+
+        assertThrows(TamanioDePaginaInvalidoException.class, () ->
+                contenidoService.explorarContenidoPopular(1,0)
         );
     }
 
     void poblarBaseParaBusquedaPorNombre() {
         contenidoService.crear(new Contenido("9789963485734", "https://www.gutenberg.org/files/36/36-h/images/cover.jpg",
                 "War Of The Worlds", "H.G. Wells", 1898 , "The War of the Worlds is one of the most frightening science fiction novels ever written. When a spaceship falls from the sky and lands in southern England, few people are worried. But when strange creatures climb out and start killing, nobody is safe.",
-                "Science Fiction, War", 3000000, 9.4, 377)
+                "Science Fiction, War", 3100000, 9.4, 377)
         );
         contenidoService.crear(new Contenido("451169514", "http://images.amazon.com/images/P/0451169514.01.LZZZZZZZ.jpg",
-                "IT", "Stephen King", 1997 , "It: Chapter Two—now a major motion picture!\n" +
-                " \n" +
-                " Stephen King’s terrifying, classic #1 New York Times bestseller, “a landmark in American literature” (Chicago Sun-Times)—about seven adults who return to their hometown to confront a nightmare they had first stumbled on as teenagers…an evil without a name: It.\n" +
-                "\n" +
-                "Welcome to Derry, Maine. It’s a small city, a place as hauntingly familiar as your own hometown. Only in Derry the haunting is real.\n" +
-                " \n" +
-                "They were seven teenagers when they first stumbled upon the horror. Now they are grown-up men and women who have gone out into the big world to gain success and happiness. But the promise they made twenty-eight years ago calls them reunite in the same place where, as teenagers, they battled an evil creature that preyed on the city’s children. Now, children are being murdered again and their repressed memories of that terrifying summer return as they prepare to once again battle the monster lurking in Derry’s sewers.\n" +
-                " \n" +
-                "Readers of Stephen King know that Derry, Maine, is a place with a deep, dark hold on the author. It reappears in many of his books, including Bag of Bones, Hearts in Atlantis, and 11/22/63. But it all starts with It.\n" +
-                " \n" +
-                "“Stephen King’s most mature work” (St. Petersburg Times), “It will overwhelm you…to be read in a well-lit room only” (Los Angeles Times).",
+                "IT", "Stephen King", 1997 , """
+                It: Chapter Two—now a major motion picture!
+                \s
+                 Stephen King’s terrifying, classic #1 New York Times bestseller, “a landmark in American literature” (Chicago Sun-Times)—about seven adults who return to their hometown to confront a nightmare they had first stumbled on as teenagers…an evil without a name: It.
+                
+                Welcome to Derry, Maine. It’s a small city, a place as hauntingly familiar as your own hometown. Only in Derry the haunting is real.
+                \s
+                They were seven teenagers when they first stumbled upon the horror. Now they are grown-up men and women who have gone out into the big world to gain success and happiness. But the promise they made twenty-eight years ago calls them reunite in the same place where, as teenagers, they battled an evil creature that preyed on the city’s children. Now, children are being murdered again and their repressed memories of that terrifying summer return as they prepare to once again battle the monster lurking in Derry’s sewers.
+                \s
+                Readers of Stephen King know that Derry, Maine, is a place with a deep, dark hold on the author. It reappears in many of his books, including Bag of Bones, Hearts in Atlantis, and 11/22/63. But it all starts with It.
+                \s
+                “Stephen King’s most mature work” (St. Petersburg Times), “It will overwhelm you…to be read in a well-lit room only” (Los Angeles Times).""",
                 "Fiction, Horror", 426, 4.5, 1168)
         );
         contenidoService.crear(new Contenido("9789963485732", "https://www.gutenberg.org/files/36/36-h/images/cover.jpg",
                 "War against the universe", "H.G. Wells", 1898 , "The War of the Worlds is one of the most frightening science fiction novels ever written. When a spaceship falls from the sky and lands in southern England, few people are worried. But when strange creatures climb out and start killing, nobody is safe.",
-                "Science Fiction, War", 3000000, 9.4, 377)
+                "Science Fiction, War", 3200000, 9.4, 377)
         );
         contenidoService.crear(new Contenido("9789963485733", "https://www.gutenberg.org/files/36/36-h/images/cover.jpg",
                 "This is WAR", "H.G. Wells", 1898 , "The War of the Worlds is one of the most frightening science fiction novels ever written. When a spaceship falls from the sky and lands in southern England, few people are worried. But when strange creatures climb out and start killing, nobody is safe.",
-                "Science Fiction, War", 3000000, 9.4, 377)
+                "Science Fiction, War", 3300000, 9.4, 377)
         );
     }
 
     @AfterEach
+    //@Test
     void cleanUp() {
-        //testService.cleanUp();
+        testService.cleanUp();
     }
 }
