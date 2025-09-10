@@ -7,7 +7,6 @@ import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.exception.ContenidoNoEncontradoException;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +33,6 @@ public class ContenidoControllerREST {
 
     @GetMapping("/{id}")
     public ContenidoResponseDTO getContenidoById(@PathVariable Long id) {
-        Object ContenidoNoEncontradoException;
         Contenido contenido = contenidoService.recuperar(id)
                 .orElseThrow(ContenidoNoEncontradoException::new);
         return ContenidoResponseDTO.desdeModelo(contenido);
@@ -57,6 +55,13 @@ public class ContenidoControllerREST {
     @GetMapping("/search")
     public PageContenidoDTO searchContenido(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
         Page<Contenido> p = contenidoService.recuperarPorNombre(nombre, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
+
+    @GetMapping("/explorarContenido")
+    public PageContenidoDTO explorarContenido( @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.explorarContenidoPopular(nroPagina, tamanioPagina);
         PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
         return pDTO;
     }

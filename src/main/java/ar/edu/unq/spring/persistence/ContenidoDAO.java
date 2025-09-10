@@ -19,6 +19,9 @@ public interface ContenidoDAO extends JpaRepository<Contenido, Long> {
     @Query("from Contenido c order by c.autores ASC")
     List<Contenido> contenidoOrdPorAutoresAsc();
 
-    @Query("from Contenido c where c.titulo ilike %:name% order by c.ratingAverage desc ")
+    @Query("from Contenido c where c.titulo ilike %:name% order by c.ratingCount desc ")
     Page<Contenido> findByTituloContaining(@Param("name") String titulo, Pageable pageable);
+
+    @Query("from Contenido c order by c.ratingCount desc ")
+    Page<Contenido> contenidoOrdPorRatingCount(@Param("name") Pageable pageable);
 }

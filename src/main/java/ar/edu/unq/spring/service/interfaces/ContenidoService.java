@@ -1,7 +1,6 @@
 package ar.edu.unq.spring.service.interfaces;
 
 import ar.edu.unq.spring.modelo.Contenido;
-import ar.edu.unq.spring.modelo.ContenidoPaginado;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -17,4 +16,5 @@ public interface ContenidoService {
     void eliminar(Contenido contenido);
 
     Page<Contenido> recuperarPorNombre(String nombre, int pagina, int tamanioPorPagina);
+    Page<Contenido> explorarContenidoPopular(int pagina, int tamanioPorPagina);
 }
