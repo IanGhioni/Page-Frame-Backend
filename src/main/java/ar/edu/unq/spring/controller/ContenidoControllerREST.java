@@ -59,7 +59,7 @@ public class ContenidoControllerREST {
         return pDTO;
     }
 
-    @GetMapping("/search")
+    @GetMapping("/explorarContenido")
     public PageContenidoDTO explorarContenido( @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
         Page<Contenido> p = contenidoService.explorarContenidoPopular(nroPagina, tamanioPagina);
         PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
