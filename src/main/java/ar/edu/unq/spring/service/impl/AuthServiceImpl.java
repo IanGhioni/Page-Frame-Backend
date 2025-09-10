@@ -13,6 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @Service
 public class AuthServiceImpl implements ar.edu.unq.spring.service.interfaces.AuthService {
 
@@ -40,14 +43,26 @@ public class AuthServiceImpl implements ar.edu.unq.spring.service.interfaces.Aut
         return new AuthResponseDTO(token);
     }
 
+    public static final Pattern emailRegex =
+            Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", Pattern.CASE_INSENSITIVE);
+
+    public static boolean validate(String emailStr) {
+        Matcher matcher = emailRegex.matcher(emailStr);
+        return matcher.matches();
+    }
+
     @Override
     public AuthResponseDTO register(RegisterRequestDTO registerRequest) {
+        if (!validate(registerRequest.getEmail())) {
+            throw new RuntimeException("El email es invalido");
+        }
+
         Usuario user = new Usuario(
                 registerRequest.getUsername(),
                 registerRequest.getEmail(),
                 passwordEncoder.encode(registerRequest.getPassword()),
-
                 JWTRole.USER);
+
         user = usuarioDAO.save(user);
 
         return new AuthResponseDTO(jwtService.getToken(user));
