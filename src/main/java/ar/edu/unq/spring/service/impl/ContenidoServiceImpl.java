@@ -76,7 +76,7 @@ public class ContenidoServiceImpl implements ContenidoService {
 
 
         PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("titulo").ascending());
-        Page<Contenido> page = this.contenidoDAO.findByTituloContaining(nombre, p);
+        Page<Contenido> page = this.contenidoDAO.findByTituloContainingRelavance(nombre, p);
 
         return page;
     }
