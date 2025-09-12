@@ -16,7 +16,10 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"username"}),
+        @UniqueConstraint(columnNames = {"email"})
+})
 public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
