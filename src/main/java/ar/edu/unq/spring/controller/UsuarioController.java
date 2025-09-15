@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin
-@RequestMapping("/holaMundo")
-public class helloWorldControllerREST {
+@RequestMapping("/usuario")
+@CrossOrigin("http://localhost:5173")
+public class UsuarioController {
 
-    @GetMapping
-    public String helloWorld() {
-        return "Hola Mundo";
+    @GetMapping("/validarLogueo")
+    public String sinTokenNoPasas() {
+        return "Si llegaste aca el logueo fue exitoso!";
     }
 }
