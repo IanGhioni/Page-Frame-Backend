@@ -1,11 +1,13 @@
 package ar.edu.unq.spring.controller;
 
+import ar.edu.unq.spring.controller.dto.UsuarioResponseDTO;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/usuario")
 @CrossOrigin("http://localhost:5173")
+
 public class UsuarioController {
     private final UsuarioService usuarioService;
 
@@ -23,5 +25,10 @@ public class UsuarioController {
         usuarioService.agregarContenidoAUsuario(idUser, idContenido, nombreLista);
     }
 
+    @GetMapping("/{username}")
+    public UsuarioResponseDTO buscarUsuarioPorUsername(@PathVariable String username) {
+        var usuario = usuarioService.recuperarPorUsername(username);
+        return UsuarioResponseDTO.fromModel(usuario);
+    }
 
 }
