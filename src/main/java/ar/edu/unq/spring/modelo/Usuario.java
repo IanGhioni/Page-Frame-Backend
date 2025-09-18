@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,20 +35,32 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<ContenidoDeUsuario> misContenidos = new ArrayList<>();
+
     private JWTRole rol;
 
-    public Usuario(String username, String email, String password, JWTRole rol) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.rol = rol;
+        public Usuario(String username, String email, String password, JWTRole rol) {
+            this.username = username;
+            this.email = email;
+            this.password = password;
+            this.rol = rol;
+        }
+
+
+    public void agregarContenido(Contenido contenido, String estado) {
+        ContenidoDeUsuario nuevo = new ContenidoDeUsuario(this, contenido, estado);
+        this.misContenidos.add(nuevo);
     }
 
-    //Logica de modelo aca debajo
-
-    //TODO: Logica de modelo
-
-
+    public void actualizarContenido(Contenido contenido, String estado) {
+        for (ContenidoDeUsuario cdu : this.misContenidos) {
+            if (cdu.getContenido().getId().equals(contenido.getId())) {
+                cdu.setEstado(estado);
+                return;
+            }
+        }
+    }
 
 
     //Metodos de la interfaz UserDetailes aca debajo (No tocar por favorcito)
