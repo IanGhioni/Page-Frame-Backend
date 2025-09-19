@@ -26,7 +26,7 @@ public class SecurityConfig {
                 authRequests ->
                         authRequests.requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/contenido/**").permitAll()
-                        .requestMatchers("/usuario/**").authenticated()
+                        .requestMatchers("/usuario/**").permitAll()
                         .anyRequest().authenticated()
         )
         .sessionManagement(sessionManager ->
