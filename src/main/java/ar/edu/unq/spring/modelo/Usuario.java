@@ -35,7 +35,7 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<ContenidoDeUsuario> misContenidos = new ArrayList<>();
 
     private JWTRole rol;

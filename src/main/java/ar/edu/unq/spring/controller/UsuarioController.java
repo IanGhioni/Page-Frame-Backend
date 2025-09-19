@@ -20,15 +20,26 @@ public class UsuarioController {
         return "Si llegaste aca el logueo fue exitoso!";
     }
 
+    @GetMapping("/{username}")
+    public UsuarioResponseDTO buscarUsuarioPorUsername(@PathVariable String username) {
+        var usuario = usuarioService.recuperarPorUsername(username);
+        return UsuarioResponseDTO.fromModel(usuario);
+    }
+
+    @GetMapping("/id/{id}")
+    public UsuarioResponseDTO buscarUsuarioPorId(@PathVariable Long id) {
+        var usuario = usuarioService.recuperar(id);
+        return UsuarioResponseDTO.fromModel(usuario);
+    }
+
     @PostMapping("/{idUser}/agregar/{idContenido}/aLista/{nombreLista}")
     public void agregarContenidoALista(@PathVariable Long idUser, @PathVariable Long idContenido, @PathVariable String nombreLista) {
         usuarioService.agregarContenidoAUsuario(idUser, idContenido, nombreLista);
     }
 
-    @GetMapping("/{username}")
-    public UsuarioResponseDTO buscarUsuarioPorUsername(@PathVariable String username) {
-        var usuario = usuarioService.recuperarPorUsername(username);
-        return UsuarioResponseDTO.fromModel(usuario);
+    @DeleteMapping("/{idUser}/eliminarDeLista/{idContenido}")
+    public void eliminarContenidoDeLista(@PathVariable Long idUser, @PathVariable Long idContenido) {
+        usuarioService.eliminarContenidoDeUsuario(idUser, idContenido);
     }
 
 }
