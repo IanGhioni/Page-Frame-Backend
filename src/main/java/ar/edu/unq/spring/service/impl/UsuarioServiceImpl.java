@@ -11,7 +11,7 @@ import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -37,6 +37,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public void actualizar(Usuario usuario) {
+        this.usuarioDAO.findById(usuario.getId()).orElseThrow(UsuarioNoEncontrado::new);
+        this.usuarioDAO.save(usuario);
+    }
+
+    @Override
+    public void eliminar(Usuario usuario) {
+        this.usuarioDAO.findById(usuario.getId()).orElseThrow(UsuarioNoEncontrado::new);
+        this.usuarioDAO.delete(usuario);
+    }
+
+    @Override
     public Usuario recuperarPorUsername(String username) {
         return this.usuarioDAO.findByUsername(username).orElseThrow(UsuarioNoEncontrado::new);
     }
@@ -59,14 +71,22 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public void actualizar(Usuario usuario) {
-        this.usuarioDAO.findById(usuario.getId()).orElseThrow(UsuarioNoEncontrado::new);
-        this.usuarioDAO.save(usuario);
+    public void eliminarContenidoDeUsuario(Long usuarioId, Long contenidoId) {
+        Usuario usuario = this.recuperar(usuarioId);
+        Contenido contenido = this.contenidoDAO.findById(contenidoId).get();
+
+        ContenidoDeUsuario contenidoDeUsuario =
+                contenidoDeUsuarioDAO.findByUsuarioIdAndContenidoId(usuario.getId(), contenido.getId());
+
+        if (contenidoDeUsuario != null) {
+            usuario.eliminarContenido(contenido);
+            usuarioDAO.save(usuario);
+        }
     }
 
     @Override
-    public void eliminar(Usuario usuario) {
-        this.usuarioDAO.findById(usuario.getId()).orElseThrow(UsuarioNoEncontrado::new);
-        this.usuarioDAO.delete(usuario);
+    public List<ContenidoDeUsuario> getContenidosDeUsuario(Long usuarioId) {
+        Usuario usuario = this.recuperar(usuarioId);
+        return usuario.getMisContenidos();
     }
 }

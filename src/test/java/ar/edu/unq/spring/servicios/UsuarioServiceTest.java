@@ -85,7 +85,7 @@ public class UsuarioServiceTest {
     }
 
     @Test
-    void testAgregarOtroContenidoALsita() {
+    void testAgregarOtroContenidoALista() {
         usuarioService.agregarContenidoAUsuario(usuario.getId(), percyJackson.getId(), "QUIERO_LEER");
         usuarioService.agregarContenidoAUsuario(usuario.getId(), madagascar.getId(), "VISTO");
 
@@ -96,7 +96,17 @@ public class UsuarioServiceTest {
         assertEquals("VISTO", usuarioRecuperado.getMisContenidos().get(1).getEstado());
     }
 
-    @AfterEach
+    @Test
+    void testEliminarContenidoDeLista() {
+        usuarioService.agregarContenidoAUsuario(usuario.getId(), percyJackson.getId(), "QUIERO_LEER");
+        var usuarioRecuperado = usuarioService.recuperar(usuario.getId());
+        var idContenido = usuarioRecuperado.getMisContenidos().get(0).getContenido().getId();
+        usuarioService.eliminarContenidoDeUsuario(usuario.getId(), idContenido);
+        usuarioRecuperado = usuarioService.recuperar(usuario.getId());
+        assertEquals(0, usuarioRecuperado.getMisContenidos().size());
+    }
+
+    //@AfterEach
     void clean() {
         testService.cleanUp();
     }

@@ -62,6 +62,9 @@ public class Usuario implements UserDetails {
         }
     }
 
+    public void eliminarContenido(Contenido contenido) {
+        this.misContenidos.removeIf(cdu -> cdu.getContenido().getId().equals(contenido.getId()));
+    }
 
     //Metodos de la interfaz UserDetailes aca debajo (No tocar por favorcito)
     @Override
