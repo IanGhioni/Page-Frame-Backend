@@ -13,5 +13,5 @@ public interface UsuarioService {
     Usuario recuperarPorUsername(String username);
     void agregarContenidoAUsuario(Long usuarioId, Long contenidoId, String estado);
     void eliminarContenidoDeUsuario(Long usuarioId, Long contenidoId);
-    List<ContenidoDeUsuario> getContenidosDeUsuario(Long usuarioId);
+    List<ContenidoDeUsuario> getContenidosDeUsuarioConEstado(Long usuarioId, String estado);
 }
