@@ -1,8 +1,13 @@
 package ar.edu.unq.spring.controller;
 
+import ar.edu.unq.spring.controller.dto.ContenidoDeUsuarioResponseDTO;
+import ar.edu.unq.spring.controller.dto.ContenidoDeUsuarioSimpleResponseDTO;
 import ar.edu.unq.spring.controller.dto.UsuarioResponseDTO;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usuario")
@@ -40,6 +45,13 @@ public class UsuarioController {
     @DeleteMapping("/{idUser}/eliminarDeLista/{idContenido}")
     public void eliminarContenidoDeLista(@PathVariable Long idUser, @PathVariable Long idContenido) {
         usuarioService.eliminarContenidoDeUsuario(idUser, idContenido);
+    }
+
+    @GetMapping("/{idUser}/lista/{nombreLista}")
+    public List<ContenidoDeUsuarioResponseDTO> listarContenidoLista(@PathVariable Long idUser, @PathVariable String nombreLista) {
+        return usuarioService.getContenidosDeUsuarioConEstado(idUser, nombreLista).stream()
+                .map(ContenidoDeUsuarioResponseDTO::fromModel)
+                .collect(Collectors.toList());
     }
 
 }

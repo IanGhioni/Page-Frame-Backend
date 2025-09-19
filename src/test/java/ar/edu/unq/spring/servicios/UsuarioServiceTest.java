@@ -106,7 +106,16 @@ public class UsuarioServiceTest {
         assertEquals(0, usuarioRecuperado.getMisContenidos().size());
     }
 
-    //@AfterEach
+    @Test
+    void testRecuperarListaLeidos(){
+        usuarioService.agregarContenidoAUsuario(usuario.getId(), percyJackson.getId(), "LEIDO");
+        usuarioService.agregarContenidoAUsuario(usuario.getId(), madagascar.getId(), "VISTO");
+        var leidos = usuarioService.getContenidosDeUsuarioConEstado(usuario.getId(), "LEIDO");
+        assertEquals(1, leidos.size());
+        assertEquals("Percy Jackson & the Olympians: The Lightning Thief", leidos.get(0).getContenido().getTitulo());
+    }
+
+    @AfterEach
     void clean() {
         testService.cleanUp();
     }

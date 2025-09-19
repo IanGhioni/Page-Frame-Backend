@@ -85,8 +85,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public List<ContenidoDeUsuario> getContenidosDeUsuario(Long usuarioId) {
-        Usuario usuario = this.recuperar(usuarioId);
-        return usuario.getMisContenidos();
+    public List<ContenidoDeUsuario> getContenidosDeUsuarioConEstado(Long usuarioId, String estado) {
+        this.recuperar(usuarioId);
+        return contenidoDeUsuarioDAO.findByUsuarioIdAndEstado(usuarioId, estado);
     }
 }
