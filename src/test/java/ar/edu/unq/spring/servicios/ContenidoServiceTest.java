@@ -1,9 +1,12 @@
 package ar.edu.unq.spring.servicios;
 
+import ar.edu.unq.spring.jwt.JWTRole;
 import ar.edu.unq.spring.modelo.Contenido;
+import ar.edu.unq.spring.modelo.Usuario;
 import ar.edu.unq.spring.modelo.exception.ContenidoNoEncontradoException;
 import ar.edu.unq.spring.modelo.exception.NroDePaginaInvalidoException;
 import ar.edu.unq.spring.modelo.exception.TamanioDePaginaInvalidoException;
+import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import ar.edu.unq.spring.testService.TestService;
 import ar.edu.unq.spring.testService.TestServiceConfig;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
@@ -27,8 +30,13 @@ public class ContenidoServiceTest {
     @Autowired
     private ContenidoService contenidoService;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
     private Contenido percyJackson;
     private Contenido climateBook;
+    private Contenido velocipastor;
+    private Usuario usuario;
 
     @BeforeEach
     void prepare() {
@@ -41,6 +49,13 @@ public class ContenidoServiceTest {
                 "The Climate Book: The Facts and the Solutions", "Greta Thunberg",2023, "A comprehensive overview of the science of climate change, its impacts, and potential solutions.",
                 "Science, Environment, Non-fiction", 3072, 4.40, 464);
         contenidoService.crear(climateBook);
+
+        usuario = new Usuario("juan123", "juan@gmail.com", "Juan1235678!!", JWTRole.USER);
+        usuarioService.crear(usuario);
+        velocipastor = new Contenido(null, "https://m.media-amazon.com/images/I/51e15zlvVDL._AC_SY200_QL15_.jpg",
+                "Velocipastor", "Brendan Steere", 2018, "Un sacerdote obtiene la habilidad de convertirse en dinosaurio y la usa para luchar contra los ninjas traficantes de drogas.",
+                "Comedy", 5, 2.0, 69);
+        contenidoService.crear(velocipastor);
     }
 
     @Test
@@ -217,7 +232,7 @@ public class ContenidoServiceTest {
                 It: Chapter Two—now a major motion picture!
                 \s
                  Stephen King’s terrifying, classic #1 New York Times bestseller, “a landmark in American literature” (Chicago Sun-Times)—about seven adults who return to their hometown to confront a nightmare they had first stumbled on as teenagers…an evil without a name: It.
-                
+
                 Welcome to Derry, Maine. It’s a small city, a place as hauntingly familiar as your own hometown. Only in Derry the haunting is real.
                 \s
                 They were seven teenagers when they first stumbled upon the horror. Now they are grown-up men and women who have gone out into the big world to gain success and happiness. But the promise they made twenty-eight years ago calls them reunite in the same place where, as teenagers, they battled an evil creature that preyed on the city’s children. Now, children are being murdered again and their repressed memories of that terrifying summer return as they prepare to once again battle the monster lurking in Derry’s sewers.
@@ -237,8 +252,40 @@ public class ContenidoServiceTest {
         );
     }
 
+    @Test
+    void testValorarContenido() {
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, usuario.getId());
+
+        var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+
+        assertEquals(1, contenidoRecuperado.getReviews().size());
+        assertEquals(5.0, contenidoRecuperado.getReviews().get(0).getValoracion());
+        assertEquals(6, contenidoRecuperado.getRatingCount());
+        assertEquals(2.5, contenidoRecuperado.getRatingAverage());
+    }
+
+    @Test
+    void testActualizarValoracion() {
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, usuario.getId());
+        contenidoService.valorarContenido(velocipastor.getId(), 4.0, usuario.getId());
+        var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+
+        assertEquals(1, contenidoRecuperado.getReviews().size());
+        assertEquals(4.0, contenidoRecuperado.getReviews().get(0).getValoracion());
+        assertEquals(6, contenidoRecuperado.getRatingCount());
+        assertEquals(2.75, contenidoRecuperado.getRatingAverage());
+    }
+
+    @Test
+    void testEliminarValoracion() {
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, usuario.getId());
+        contenidoService.eliminarValoracionContenido(velocipastor.getId(), usuario.getId());
+        var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+        assertEquals(0, contenidoRecuperado.getReviews().size());
+    }
+
+
     @AfterEach
-    //@Test
     void cleanUp() {
         testService.cleanUp();
     }

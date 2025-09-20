@@ -65,4 +65,9 @@ public class ContenidoControllerREST {
         PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
         return pDTO;
     }
+
+    @PostMapping("/{contenidoId}/valorar/{valoracion}/{usuarioId}")
+    public void valorarContenido(@PathVariable Long contenidoId, @PathVariable Double valoracion, @PathVariable Long usuarioId) {
+        contenidoService.valorarContenido(contenidoId, valoracion, usuarioId);
+    }
 }
