@@ -61,7 +61,7 @@ public class AuthServiceImpl implements ar.edu.unq.spring.service.interfaces.Aut
                 registerRequest.getUsername(),
                 registerRequest.getEmail(),
                 passwordEncoder.encode(registerRequest.getPassword()),
-                JWTRole.USER);
+                JWTRole.USER, registerRequest.getFotoPerfil());
 
         user = usuarioDAO.save(user);
 

@@ -38,13 +38,16 @@ public class Usuario implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<ContenidoDeUsuario> misContenidos = new ArrayList<>();
 
+    private String fotoPerfil;
+
     private JWTRole rol;
 
-        public Usuario(String username, String email, String password, JWTRole rol) {
+        public Usuario(String username, String email, String password, JWTRole rol, String fotoPerfil) {
             this.username = username;
             this.email = email;
             this.password = password;
             this.rol = rol;
+            this.fotoPerfil = fotoPerfil;
         }
 
 

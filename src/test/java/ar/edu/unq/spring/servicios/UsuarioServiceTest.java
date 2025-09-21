@@ -39,7 +39,7 @@ public class UsuarioServiceTest {
                 "Percy Jackson & the Olympians: The Lightning Thief", "Rick Riordan", 2005, "A teenager discovers he's the descendant of a Greek god and sets out on an adventure to settle an on-going battle between the gods.",
                 "Fantasy, Adventure", 3000000, 3.4, 377);
         contenidoService.crear(percyJackson);
-        usuario = new Usuario("juan123", "juan@gmail.com", "Juan1235678!!", JWTRole.USER);
+        usuario = new Usuario("juan123", "juan@gmail.com", "Juan1235678!!", JWTRole.USER, "panda");
         usuarioService.crear(usuario);
         madagascar = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
                 "Madagascar", "Eric Darnell, Tom McGrath", 2005, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
@@ -49,14 +49,14 @@ public class UsuarioServiceTest {
 
     @Test
     void testCrearContenido() {
-        Usuario emily = new Usuario("emily", "emily@gmail.com", "Emily1235678!!", JWTRole.USER);
+        Usuario emily = new Usuario("emily", "emily@gmail.com", "Emily1235678!!", JWTRole.USER, "panda");
         Usuario emilyPers = usuarioService.crear(emily);
 
         assertEquals(emily.getId(), emilyPers.getId());
     }
     @Test
     void testEliminarContenido() {
-        Usuario emily = new Usuario("emily2", "emily2@gmial.com", "Emily1235678!!", JWTRole.USER);
+        Usuario emily = new Usuario("emily2", "emily2@gmial.com", "Emily1235678!!", JWTRole.USER, "panda");
         var emilyPers = usuarioService.crear(emily);
         usuarioService.eliminar(emilyPers);
 
