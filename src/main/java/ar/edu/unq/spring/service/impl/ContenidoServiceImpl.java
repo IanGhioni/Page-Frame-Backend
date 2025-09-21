@@ -1,11 +1,13 @@
 package ar.edu.unq.spring.service.impl;
 
 import ar.edu.unq.spring.modelo.Contenido;
+import ar.edu.unq.spring.modelo.Usuario;
 import ar.edu.unq.spring.modelo.exception.ContenidoNoEncontradoException;
 import ar.edu.unq.spring.modelo.exception.NroDePaginaInvalidoException;
 import ar.edu.unq.spring.modelo.exception.TamanioDePaginaInvalidoException;
 import ar.edu.unq.spring.persistence.ContenidoDAO;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
+import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,9 +21,11 @@ import java.util.Optional;
 @Transactional
 public class ContenidoServiceImpl implements ContenidoService {
     private final ContenidoDAO contenidoDAO;
+    private final UsuarioService usuarioService;
 
-    public ContenidoServiceImpl(ContenidoDAO contenidoDAO) {
+    public ContenidoServiceImpl(ContenidoDAO contenidoDAO, UsuarioService usuarioService) {
         this.contenidoDAO = contenidoDAO;
+        this.usuarioService = usuarioService;
     }
 
     @Override
@@ -94,5 +98,25 @@ public class ContenidoServiceImpl implements ContenidoService {
         Page<Contenido> page = this.contenidoDAO.contenidoOrdPorRatingCount(p);
 
         return page;
+    }
+
+    @Override
+    public void valorarContenido(Long contenidoId, Double valoracion, Long usuarioId) {
+        Contenido contenido = this.contenidoDAO.findById(contenidoId)
+                .orElseThrow(ContenidoNoEncontradoException::new);
+        Usuario usuario = this.usuarioService.recuperar(usuarioId);
+
+        contenido.agregarOActualizarReview(usuario, valoracion);
+        this.contenidoDAO.save(contenido);
+    }
+
+    @Override
+    public void eliminarValoracionContenido(Long contenidoId, Long usuarioId) {
+        Contenido contenido = this.contenidoDAO.findById(contenidoId
+        ).orElseThrow(ContenidoNoEncontradoException::new);
+        Usuario usuario = this.usuarioService.recuperar(usuarioId);
+        contenido.eliminarReview(usuario);
+        this.contenidoDAO.save(contenido);
+
     }
 }
