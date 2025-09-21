@@ -37,13 +37,13 @@ public class UsuarioServiceTest {
     void prepare() {
         percyJackson = new Contenido("0-7868-5629-7", "https://upload.wikimedia.org/wikipedia/en/3/3b/The_Lightning_Thief_cover.jpg",
                 "Percy Jackson & the Olympians: The Lightning Thief", "Rick Riordan", 2005, "A teenager discovers he's the descendant of a Greek god and sets out on an adventure to settle an on-going battle between the gods.",
-                "Fantasy, Adventure", 3000000, 9.4, 377);
+                "Fantasy, Adventure", 3000000, 3.4, 377);
         contenidoService.crear(percyJackson);
         usuario = new Usuario("juan123", "juan@gmail.com", "Juan1235678!!", JWTRole.USER, "panda");
         usuarioService.crear(usuario);
         madagascar = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
                 "Madagascar", "Eric Darnell, Tom McGrath", 2005, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
-                "Animation, Comedy", 465000, 6.9, 86);
+                "Animation, Comedy", 465000, 2.9, 86);
         contenidoService.crear(madagascar);
     }
 

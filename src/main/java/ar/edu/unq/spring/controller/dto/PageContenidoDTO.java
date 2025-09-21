@@ -5,14 +5,14 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public record PageContenidoDTO(List<Contenido> resultados,
+public record PageContenidoDTO(List<ContenidoResponseDTO> resultados,
                                int numeroDePagina,
                                int totalDePaginas,
                                int totalDeElementos) {
 
     public static PageContenidoDTO converter(Page<Contenido> page) {
         return new PageContenidoDTO(
-                page.getContent(),
+                page.getContent().stream().map(ContenidoResponseDTO::desdeModelo).toList(),
                 page.getNumber(),
                 page.getTotalPages(),
                 (int) page.getTotalElements()

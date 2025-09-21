@@ -1,13 +1,11 @@
 package ar.edu.unq.spring.modelo;
 
 import jakarta.persistence.*;
-import jakarta.validation.Constraint;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Year;
+import java.util.ArrayList;
+import java.util.List;
 
 @ToString
 @Setter
@@ -63,6 +61,9 @@ public class Contenido {
     @Column(nullable = false)
     private int largo;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
     public Contenido(String isbn, String imagen, String titulo, String autores, int publicacion, String descripcion,
             String categoria, double ratingCount, double ratingAverage, int largo) {
         this.isbn = isbn;
@@ -75,5 +76,39 @@ public class Contenido {
         this.ratingCount = ratingCount;
         this.ratingAverage = ratingAverage;
         this.largo = largo;
+    }
+    public void eliminarReview(Usuario usuario) {
+        this.reviews.removeIf(review -> review.getUsuario().getId().equals(usuario.getId()));
+        this.ratingCount-=1;
+        this.actualizarRatingPromedio();
+    }
+
+    public void agregarOActualizarReview(Usuario usuario, Double valoracion) {
+        boolean reviewExistente = this.reviews.stream()
+                .filter(review -> review.getUsuario().getId().equals(usuario.getId()))
+                .findFirst()
+                .map(review -> {
+                    review.setValoracion(valoracion); // Actualiza si existe
+                    return true;
+                })
+                .orElseGet(() -> {
+                    this.reviews.add(new Review(usuario, this, valoracion)); // Agrega si no existe
+                    this.ratingCount += 1; // Incrementa solo si es nueva
+                    return false;
+                });
+
+        this.actualizarRatingPromedio();
+    }
+
+    private void actualizarRatingPromedio() {
+        if (this.ratingCount == 0) {
+            this.ratingAverage = 0;
+        } else {
+            int cantReviewsUsuarios = this.reviews.size();
+
+            double totalReviews = ratingAverage * (this.ratingCount - cantReviewsUsuarios); //externas
+            totalReviews += this.reviews.stream().mapToDouble(Review::getValoracion).sum(); //le sumo las nuetras
+            this.ratingAverage = totalReviews / this.ratingCount;
+        }
     }
 }
