@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,7 +17,10 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"username"}),
+        @UniqueConstraint(columnNames = {"email"})
+})
 public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,21 +35,39 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<ContenidoDeUsuario> misContenidos = new ArrayList<>();
+
+    private String fotoPerfil;
+
     private JWTRole rol;
 
-    public Usuario(String username, String email, String password, JWTRole rol) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.rol = rol;
+        public Usuario(String username, String email, String password, JWTRole rol, String fotoPerfil) {
+            this.username = username;
+            this.email = email;
+            this.password = password;
+            this.rol = rol;
+            this.fotoPerfil = fotoPerfil;
+        }
+
+
+    public void agregarContenido(Contenido contenido, String estado) {
+        ContenidoDeUsuario nuevo = new ContenidoDeUsuario(this, contenido, estado);
+        this.misContenidos.add(nuevo);
     }
 
-    //Logica de modelo aca debajo
+    public void actualizarContenido(Contenido contenido, String estado) {
+        for (ContenidoDeUsuario cdu : this.misContenidos) {
+            if (cdu.getContenido().getId().equals(contenido.getId())) {
+                cdu.setEstado(estado);
+                return;
+            }
+        }
+    }
 
-    //TODO: Logica de modelo
-
-
-
+    public void eliminarContenido(Contenido contenido) {
+        this.misContenidos.removeIf(cdu -> cdu.getContenido().getId().equals(contenido.getId()));
+    }
 
     //Metodos de la interfaz UserDetailes aca debajo (No tocar por favorcito)
     @Override

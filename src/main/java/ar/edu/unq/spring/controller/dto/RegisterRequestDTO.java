@@ -12,4 +12,5 @@ public class RegisterRequestDTO {
     String username;
     String email;
     String password;
+    String fotoPerfil;
 }
