@@ -3,7 +3,7 @@ package ar.edu.unq.spring.servicios;
 import ar.edu.unq.spring.jwt.JWTRole;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.Usuario;
-import ar.edu.unq.spring.modelo.exception.UsuarioNoEncontrado;
+import ar.edu.unq.spring.exception.UsuarioNoEncontrado;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import ar.edu.unq.spring.testService.TestService;

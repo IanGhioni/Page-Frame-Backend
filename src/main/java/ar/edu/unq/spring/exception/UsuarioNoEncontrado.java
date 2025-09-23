@@ -1,7 +1,7 @@
-package ar.edu.unq.spring.modelo.exception;
+package ar.edu.unq.spring.exception;
 
 public class UsuarioNoEncontrado extends RuntimeException {
     public UsuarioNoEncontrado() {
-        super("El usuario no fue encontrado");
+        super("Usuario no encontrado");
     }
 }

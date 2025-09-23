@@ -1,4 +1,4 @@
-package ar.edu.unq.spring.modelo.exception;
+package ar.edu.unq.spring.exception;
 
 public class ContenidoNoEncontradoException extends RuntimeException {
     public ContenidoNoEncontradoException() {
