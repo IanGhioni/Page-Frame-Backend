@@ -3,7 +3,7 @@ package ar.edu.unq.spring.service.impl;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuario;
 import ar.edu.unq.spring.modelo.Usuario;
-import ar.edu.unq.spring.modelo.exception.UsuarioNoEncontrado;
+import ar.edu.unq.spring.exception.UsuarioNoEncontrado;
 import ar.edu.unq.spring.persistence.ContenidoDAO;
 import ar.edu.unq.spring.persistence.ContenidoDeUsuarioDAO;
 import ar.edu.unq.spring.persistence.UsuarioDAO;

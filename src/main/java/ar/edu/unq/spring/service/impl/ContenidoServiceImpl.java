@@ -2,9 +2,9 @@ package ar.edu.unq.spring.service.impl;
 
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.Usuario;
-import ar.edu.unq.spring.modelo.exception.ContenidoNoEncontradoException;
-import ar.edu.unq.spring.modelo.exception.NroDePaginaInvalidoException;
-import ar.edu.unq.spring.modelo.exception.TamanioDePaginaInvalidoException;
+import ar.edu.unq.spring.exception.ContenidoNoEncontradoException;
+import ar.edu.unq.spring.exception.NroDePaginaInvalidoException;
+import ar.edu.unq.spring.exception.TamanioDePaginaInvalidoException;
 import ar.edu.unq.spring.persistence.ContenidoDAO;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
@@ -71,13 +71,7 @@ public class ContenidoServiceImpl implements ContenidoService {
 
     @Override
     public Page<Contenido> recuperarPorNombre(String nombre, int nroPagina, int tamanioPorPagina) {
-        if (nroPagina < 0) {
-            throw new NroDePaginaInvalidoException();
-        }
-        if (tamanioPorPagina < 1) {
-            throw new TamanioDePaginaInvalidoException();
-        }
-
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
 
         PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("titulo").ascending());
         Page<Contenido> page = this.contenidoDAO.findByTituloContainingRelavance(nombre, p);
@@ -87,12 +81,7 @@ public class ContenidoServiceImpl implements ContenidoService {
 
     @Override
     public Page<Contenido> explorarContenidoPopular(int nroPagina, int tamanioPorPagina) {
-        if (nroPagina < 0) {
-            throw new NroDePaginaInvalidoException();
-        }
-        if (tamanioPorPagina < 1) {
-            throw new TamanioDePaginaInvalidoException();
-        }
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
 
         PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("ratingCount").descending());
         Page<Contenido> page = this.contenidoDAO.contenidoOrdPorRatingCount(p);
@@ -118,5 +107,14 @@ public class ContenidoServiceImpl implements ContenidoService {
         contenido.eliminarReview(usuario);
         this.contenidoDAO.save(contenido);
 
+    }
+
+    public void validarPaginacion(int nroPagina, int tamanioPorPagina) {
+        if (nroPagina < 0) {
+            throw new NroDePaginaInvalidoException();
+        }
+        if (tamanioPorPagina < 1) {
+            throw new TamanioDePaginaInvalidoException();
+        }
     }
 }

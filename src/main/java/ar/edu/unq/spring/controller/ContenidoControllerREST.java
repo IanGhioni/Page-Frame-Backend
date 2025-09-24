@@ -4,7 +4,7 @@ import ar.edu.unq.spring.controller.dto.ContenidoBodyDTO;
 import ar.edu.unq.spring.controller.dto.ContenidoResponseDTO;
 import ar.edu.unq.spring.controller.dto.PageContenidoDTO;
 import ar.edu.unq.spring.modelo.Contenido;
-import ar.edu.unq.spring.modelo.exception.ContenidoNoEncontradoException;
+import ar.edu.unq.spring.exception.ContenidoNoEncontradoException;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

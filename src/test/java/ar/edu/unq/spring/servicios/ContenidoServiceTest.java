@@ -3,9 +3,9 @@ package ar.edu.unq.spring.servicios;
 import ar.edu.unq.spring.jwt.JWTRole;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.Usuario;
-import ar.edu.unq.spring.modelo.exception.ContenidoNoEncontradoException;
-import ar.edu.unq.spring.modelo.exception.NroDePaginaInvalidoException;
-import ar.edu.unq.spring.modelo.exception.TamanioDePaginaInvalidoException;
+import ar.edu.unq.spring.exception.ContenidoNoEncontradoException;
+import ar.edu.unq.spring.exception.NroDePaginaInvalidoException;
+import ar.edu.unq.spring.exception.TamanioDePaginaInvalidoException;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import ar.edu.unq.spring.testService.TestService;
 import ar.edu.unq.spring.testService.TestServiceConfig;
@@ -50,7 +50,7 @@ public class ContenidoServiceTest {
                 "Science, Environment, Non-fiction", 3072, 4.40, 464);
         contenidoService.crear(climateBook);
 
-        usuario = new Usuario("juan123", "juan@gmail.com", "Juan1235678!!", JWTRole.USER);
+        usuario = new Usuario("juan123", "juan@gmail.com", "Juan1235678!!", JWTRole.USER, "panda");
         usuarioService.crear(usuario);
         velocipastor = new Contenido(null, "https://m.media-amazon.com/images/I/51e15zlvVDL._AC_SY200_QL15_.jpg",
                 "Velocipastor", "Brendan Steere", 2018, "Un sacerdote obtiene la habilidad de convertirse en dinosaurio y la usa para luchar contra los ninjas traficantes de drogas.",
@@ -135,31 +135,34 @@ public class ContenidoServiceTest {
     void testRecuperarTodoElContenido() {
         var todo = contenidoService.recuperarTodos();
 
-        assertEquals(2, todo.size());
+        assertEquals(3, todo.size());
     }
 
     @Test
     void testRecuperarTodoElContenidoOrdenadoPorTituloAsc() {
         var todo = contenidoService.recuperarTodoOrdenadoPorTituloAsc();
 
-        assertEquals(2, todo.size());
+        assertEquals(3, todo.size());
         assertEquals(todo.get(0).getTitulo(), percyJackson.getTitulo());
         assertEquals(todo.get(1).getTitulo(), climateBook.getTitulo());
+        assertEquals(todo.get(2).getTitulo(), velocipastor.getTitulo());
     }
 
     @Test
     void testRecuperarTodoElContenidoOrdenadoPorAutoresAsc() {
         var todo = contenidoService.recuperarTodoOrdenadoPorAutoresAsc();
 
-        assertEquals(2, todo.size());
-        assertEquals(todo.get(0).getAutores(), climateBook.getAutores());
-        assertEquals(todo.get(1).getAutores(), percyJackson.getAutores());
+        assertEquals(3, todo.size());
+        assertEquals(todo.get(0).getAutores(), velocipastor.getAutores());
+        assertEquals(todo.get(1).getAutores(), climateBook.getAutores());
+        assertEquals(todo.get(2).getAutores(), percyJackson.getAutores());
     }
 
     @Test
     void testRecuperarTodoElContenidoConBaseVacia() {
         contenidoService.eliminar(percyJackson);
         contenidoService.eliminar(climateBook);
+        contenidoService.eliminar(velocipastor);
 
         var todo = contenidoService.recuperarTodos();
 
