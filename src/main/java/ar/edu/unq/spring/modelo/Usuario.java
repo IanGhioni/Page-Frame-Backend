@@ -7,9 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @ToString
 @Setter
@@ -38,6 +36,9 @@ public class Usuario implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<ContenidoDeUsuario> misContenidos = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private Set<ContenidoDeUsuarioPersonalizado> listasPersonalizadas;
+
     private String fotoPerfil;
 
     private JWTRole rol;
@@ -48,6 +49,7 @@ public class Usuario implements UserDetails {
             this.password = password;
             this.rol = rol;
             this.fotoPerfil = fotoPerfil;
+            this.listasPersonalizadas = new HashSet<>();
         }
 
 
@@ -67,6 +69,15 @@ public class Usuario implements UserDetails {
 
     public void eliminarContenido(Contenido contenido) {
         this.misContenidos.removeIf(cdu -> cdu.getContenido().getId().equals(contenido.getId()));
+    }
+
+    public void agregarListaPersonalizada(String nombre, String descripcion) {
+        ContenidoDeUsuarioPersonalizado nuevaLista = new ContenidoDeUsuarioPersonalizado(this, nombre, descripcion, new HashSet<>());
+        this.listasPersonalizadas.add(nuevaLista);
+    }
+
+    public void agregarContenidoAListaPersonalizada(ContenidoDeUsuarioPersonalizado lista, Contenido contenido) {
+            lista.getContenido().add(contenido);
     }
 
     //Metodos de la interfaz UserDetailes aca debajo (No tocar por favorcito)
@@ -99,4 +110,5 @@ public class Usuario implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

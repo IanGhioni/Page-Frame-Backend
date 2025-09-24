@@ -54,4 +54,14 @@ public class UsuarioController {
                 .collect(Collectors.toList());
     }
 
+    @PostMapping("/{idUser}/crear/{nombreLista}/conDescripcion/{descripcion}")
+    public void crearListaPersonalizada(@PathVariable Long idUser, @PathVariable String nombreLista, @PathVariable String descripcion) {
+        usuarioService.crearListaPersonalizada(idUser, nombreLista, descripcion);
+    }
+
+    @PostMapping("/{idUser}/agregar/{idContenido}/aListaPersonalizada/{nombreLista}")
+    public void agregarContenidoAListaPersonalizada(@PathVariable Long idUser, @PathVariable Long idContenido, @PathVariable String nombreLista) {
+        usuarioService.agregarContenidoAListaPersonalizada(idUser, idContenido, nombreLista);
+    }
+
 }
