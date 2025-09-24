@@ -144,10 +144,22 @@ public class UsuarioServiceTest {
 
         assertEquals(1, lista.size());
         assertTrue(lista.stream().anyMatch(c -> c.getId().equals(madagascar.getId())));
-
     }
 
-        @AfterEach
+    @Test
+    void testGetListasPersonalizadasDeUsuario() {
+        Usuario usuario = usuarioService.crear(new Usuario("orne1", "orne1@gmail.com", "Orne1235678!!", JWTRole.USER, "panda"));
+
+        usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros");
+
+        usuarioService.agregarContenidoAListaPersonalizada(usuario.getId(), madagascar.getId(), "favoritos");
+
+        var listas = usuarioService.getListasPersonalizadasDeUsuario(usuario.getId());
+
+        assertEquals(1, listas.size());
+    }
+
+    @AfterEach
         void clean () {
             testService.cleanUp();
         }

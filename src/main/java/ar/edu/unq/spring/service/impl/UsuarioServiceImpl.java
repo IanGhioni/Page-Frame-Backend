@@ -119,4 +119,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         return lista.getContenido();
     }
 
+    @Override
+    public Set<ContenidoDeUsuarioPersonalizado> getListasPersonalizadasDeUsuario(Long usuarioId) {
+        Usuario usuario = this.recuperar(usuarioId);
+        return usuario.getListasPersonalizadas();
+    }
 }

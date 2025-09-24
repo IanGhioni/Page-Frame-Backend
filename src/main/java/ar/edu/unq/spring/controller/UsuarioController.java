@@ -1,8 +1,7 @@
 package ar.edu.unq.spring.controller;
 
-import ar.edu.unq.spring.controller.dto.ContenidoDeUsuarioResponseDTO;
-import ar.edu.unq.spring.controller.dto.ContenidoDeUsuarioSimpleResponseDTO;
-import ar.edu.unq.spring.controller.dto.UsuarioResponseDTO;
+import ar.edu.unq.spring.controller.dto.*;
+import ar.edu.unq.spring.modelo.ContenidoDeUsuarioPersonalizado;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,4 +63,17 @@ public class UsuarioController {
         usuarioService.agregarContenidoAListaPersonalizada(idUser, idContenido, nombreLista);
     }
 
+    @GetMapping("/{idUser}/listas")
+    public List<ListaPersonalizadaDTO> getListasPersonalizadasDeUsuario(@PathVariable Long idUser) {
+        var listas = usuarioService.getListasPersonalizadasDeUsuario(idUser);
+
+        return listas.stream()
+                .map(lista -> ListaPersonalizadaDTO.fromModel(
+                        lista.getContenido().stream()
+                                .map(ContenidoBodyDTO::fromModel)
+                                .collect(Collectors.toSet()),
+                        lista.getNombre(),
+                        lista.getDescripcion()))
+                .collect(Collectors.toList());
+    }
 }
