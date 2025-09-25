@@ -2,6 +2,7 @@ package ar.edu.unq.spring.servicios;
 
 import ar.edu.unq.spring.jwt.JWTRole;
 import ar.edu.unq.spring.modelo.Contenido;
+import ar.edu.unq.spring.modelo.ContenidoDeUsuarioPersonalizado;
 import ar.edu.unq.spring.modelo.Usuario;
 import ar.edu.unq.spring.exception.UsuarioNoEncontrado;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
@@ -14,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -54,6 +58,7 @@ public class UsuarioServiceTest {
 
         assertEquals(emily.getId(), emilyPers.getId());
     }
+
     @Test
     void testEliminarContenido() {
         Usuario emily = new Usuario("emily2", "emily2@gmial.com", "Emily1235678!!", JWTRole.USER, "panda");
@@ -107,7 +112,7 @@ public class UsuarioServiceTest {
     }
 
     @Test
-    void testRecuperarListaLeidos(){
+    void testRecuperarListaLeidos() {
         usuarioService.agregarContenidoAUsuario(usuario.getId(), percyJackson.getId(), "LEIDO");
         usuarioService.agregarContenidoAUsuario(usuario.getId(), madagascar.getId(), "VISTO");
         var leidos = usuarioService.getContenidosDeUsuarioConEstado(usuario.getId(), "LEIDO");
@@ -115,8 +120,123 @@ public class UsuarioServiceTest {
         assertEquals("Percy Jackson & the Olympians: The Lightning Thief", leidos.get(0).getContenido().getTitulo());
     }
 
-    @AfterEach
-    void clean() {
-        testService.cleanUp();
+    @Test
+    void testCrearListaPersonalizada() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        usuarioService.crearListaPersonalizada(ornePers.getId(), "contenidoFav", "libros y pelis que cambiaron mi vida");
+
+        Usuario ornePersConLista = usuarioService.recuperar(ornePers.getId());
+        assertEquals(1, ornePersConLista.getListasPersonalizadas().size());
     }
-}
+
+    @Test
+    void testAgregarContenidoAListaPersonalizada() {
+        Usuario usuario = usuarioService.crear(new Usuario("orne1", "orne1@gmail.com", "Orne1235678!!", JWTRole.USER, "panda"));
+
+        usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros");
+
+        usuarioService.agregarContenidoAListaPersonalizada(usuario.getId(), madagascar.getId(), "favoritos");
+
+        Usuario actualizado = usuarioService.recuperar(usuario.getId());
+        Set<Contenido> lista = usuarioService.getContenidosDeListaPersonalizada(actualizado.getId(), "favoritos");
+
+        assertEquals(1, lista.size());
+        assertTrue(lista.stream().anyMatch(c -> c.getId().equals(madagascar.getId())));
+    }
+
+    @Test
+    void testGetListasPersonalizadasDeUsuario() {
+        Usuario usuario = usuarioService.crear(new Usuario("orne1", "orne1@gmail.com", "Orne1235678!!", JWTRole.USER, "panda"));
+
+        usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros");
+
+        usuarioService.agregarContenidoAListaPersonalizada(usuario.getId(), madagascar.getId(), "favoritos");
+
+        var listas = usuarioService.getListasPersonalizadasDeUsuario(usuario.getId());
+
+        assertEquals(1, listas.size());
+    }
+
+    @Test
+    void testEliminarListaPersonalizada() {
+        Usuario usuario = usuarioService.crear(new Usuario("pepe", "pepe@gmail.com", "Pepe1235678!!", JWTRole.USER, "panda"));
+
+        usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros");
+
+        usuarioService.eliminarListaPersonalizada(usuario.getId(), "favoritos");
+
+        var listas = usuarioService.getListasPersonalizadasDeUsuario(usuario.getId());
+
+        assertEquals(0, listas.size());
+    }
+
+    @Test
+    void testEliminarListaPersonalizada2() {
+        Usuario usuario = usuarioService.crear(new Usuario("pepo", "pepo@gmail.com", "Pepo1235678!!", JWTRole.USER, "panda"));
+
+        usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros");
+        usuarioService.crearListaPersonalizada(usuario.getId(), "pelis", "pelis que me gustan");
+
+        usuarioService.eliminarListaPersonalizada(usuario.getId(), "favoritos");
+
+        var listas = usuarioService.getListasPersonalizadasDeUsuario(usuario.getId());
+
+        assertEquals(1, listas.size());
+    }
+
+    @Test
+    void testEliminarContenidoDeListaPersonalizada() {
+        Usuario usuario = usuarioService.crear(new Usuario("orne2", "orne2@gmail.com", "Orne1235678!!", JWTRole.USER, "panda"));
+
+        usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros");
+
+        usuarioService.agregarContenidoAListaPersonalizada(usuario.getId(), madagascar.getId(), "favoritos");
+
+        usuarioService.eliminarContenidoDeListaPersonalizada(usuario.getId(), madagascar.getId(), "favoritos");
+
+        Usuario actualizado = usuarioService.recuperar(usuario.getId());
+        Set<Contenido> lista = usuarioService.getContenidosDeListaPersonalizada(actualizado.getId(), "favoritos");
+
+        assertTrue(lista.isEmpty());
+    }
+
+    @Test
+    void testEliminarContenidoDeListaPersonalizada2() {
+        Usuario usuario = usuarioService.crear(new Usuario("orne2", "orne2@gmail.com", "Orne1235678!!", JWTRole.USER, "panda"));
+
+        usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros");
+
+        usuarioService.agregarContenidoAListaPersonalizada(usuario.getId(), madagascar.getId(), "favoritos");
+        usuarioService.agregarContenidoAListaPersonalizada(usuario.getId(), percyJackson.getId(), "favoritos");
+
+        usuarioService.eliminarContenidoDeListaPersonalizada(usuario.getId(), madagascar.getId(), "favoritos");
+
+        Usuario actualizado = usuarioService.recuperar(usuario.getId());
+        Set<Contenido> lista = usuarioService.getContenidosDeListaPersonalizada(actualizado.getId(), "favoritos");
+
+        assertEquals(1, lista.size());
+    }
+
+    @Test
+    void testAgregarMismoContenidoAListaPersonalizadaLoAgregaUnaVez() {
+        Usuario usuario = usuarioService.crear(new Usuario("orne1", "orne1@gmail.com", "Orne1235678!!", JWTRole.USER, "panda"));
+
+        usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros");
+
+        usuarioService.agregarContenidoAListaPersonalizada(usuario.getId(), madagascar.getId(), "favoritos");
+        usuarioService.agregarContenidoAListaPersonalizada(usuario.getId(), madagascar.getId(), "favoritos");
+
+        Usuario actualizado = usuarioService.recuperar(usuario.getId());
+        Set<Contenido> lista = usuarioService.getContenidosDeListaPersonalizada(actualizado.getId(), "favoritos");
+
+        assertEquals(1, lista.size());
+    }
+
+    @AfterEach
+        void clean () {
+            testService.cleanUp();
+        }
+    }
+
