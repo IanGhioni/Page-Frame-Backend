@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/usuario")
 @CrossOrigin("http://localhost:5173")
-
 public class UsuarioController {
     private final UsuarioService usuarioService;
 
@@ -53,9 +52,9 @@ public class UsuarioController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping("/{idUser}/crear/{nombreLista}/conDescripcion/{descripcion}")
-    public void crearListaPersonalizada(@PathVariable Long idUser, @PathVariable String nombreLista, @PathVariable String descripcion) {
-        usuarioService.crearListaPersonalizada(idUser, nombreLista, descripcion);
+    @PostMapping("/{idUser}/crearLista")
+    public void crearListaPersonalizada(@RequestBody ListaPersonalizadaDTO lista, @PathVariable Long idUser) {
+        usuarioService.crearListaPersonalizada(idUser, lista.nombre(), lista.descripcion());
     }
 
     @PostMapping("/{idUser}/agregar/{idContenido}/aListaPersonalizada/{nombreLista}")
@@ -70,7 +69,7 @@ public class UsuarioController {
         return listas.stream()
                 .map(lista -> ListaPersonalizadaDTO.fromModel(
                         lista.getContenido().stream()
-                                .map(ContenidoBodyDTO::fromModel)
+                                .map(ContenidoResponseDTO::desdeModelo)
                                 .collect(Collectors.toSet()),
                         lista.getNombre(),
                         lista.getDescripcion()))
