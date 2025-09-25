@@ -1,5 +1,6 @@
 package ar.edu.unq.spring.service.impl;
 
+import ar.edu.unq.spring.exception.ContenidoNoEncontradoException;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuario;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuarioPersonalizado;
@@ -124,4 +125,23 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = this.recuperar(usuarioId);
         return usuario.getListasPersonalizadas();
     }
+
+    @Override
+    public void eliminarContenidoDeListaPersonalizada(Long usuarioId, Long contenidoId, String nombre) {
+        Usuario usuario = this.recuperar(usuarioId);
+        Contenido contenido = this.contenidoDAO.findById(contenidoId).orElseThrow(ContenidoNoEncontradoException::new);
+
+        ContenidoDeUsuarioPersonalizado lista = contenidoDeUsuarioPersonalizadoDAO.findByUsuarioIdAndNombre(usuarioId, nombre);
+
+        lista.getContenido().remove(contenido);
+        usuarioDAO.save(usuario);
+
+    }
+
+    @Override
+    public void eliminarListaPersonalizada(Long usuarioId, String nombre) {
+        Usuario usuario = this.recuperar(usuarioId);
+        usuario.eliminarListaPersonalizada(nombre);
+    }
+
 }

@@ -1,6 +1,7 @@
 package ar.edu.unq.spring.controller;
 
 import ar.edu.unq.spring.controller.dto.*;
+import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuarioPersonalizado;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import org.springframework.web.bind.annotation.*;
@@ -76,4 +77,15 @@ public class UsuarioController {
                         lista.getDescripcion()))
                 .collect(Collectors.toList());
     }
+
+    @DeleteMapping("/{idUser}/eliminar/{contenido}/DeListaPersonalizada/{nombre}")
+    public void eliminarContenidoDeListaPersonalizada(@PathVariable Long idUser, @PathVariable Contenido contenido, @PathVariable String nombre) {
+        usuarioService.eliminarContenidoDeListaPersonalizada(idUser, contenido.getId(), nombre);
+    }
+
+    @DeleteMapping("/{idUser}/eliminar/listaPersonalizada/{nombre}")
+    public void eliminarListaPersonalizada(@PathVariable Long idUser, @PathVariable String nombre) {
+        usuarioService.eliminarListaPersonalizada(idUser, nombre);
+    }
+
 }
