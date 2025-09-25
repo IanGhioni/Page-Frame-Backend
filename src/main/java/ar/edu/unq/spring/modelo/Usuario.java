@@ -80,6 +80,15 @@ public class Usuario implements UserDetails {
             lista.getContenido().add(contenido);
     }
 
+    public void eliminarContenidoDeLista(Contenido contenido, Set<Contenido> contenidoDeUsuarioPersonalizado) {
+            contenidoDeUsuarioPersonalizado.remove(contenido);
+    }
+
+    public void eliminarListaPersonalizada(String nombre) {
+            ContenidoDeUsuarioPersonalizado lista = this.listasPersonalizadas.stream().filter(cdup -> cdup.getNombre().equals(nombre)).findFirst().orElse(null);
+            listasPersonalizadas.remove(lista);
+    }
+
     //Metodos de la interfaz UserDetailes aca debajo (No tocar por favorcito)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

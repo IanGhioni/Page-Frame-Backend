@@ -21,4 +21,6 @@ public interface UsuarioService {
     void agregarContenidoAListaPersonalizada(Long usuarioId, Long contenidoId, String nombre);
     Set<Contenido> getContenidosDeListaPersonalizada(Long usuarioId, String nombre);
     Set<ContenidoDeUsuarioPersonalizado> getListasPersonalizadasDeUsuario(Long usuarioId);
+    void eliminarListaPersonalizada(Long usuarioId, String nombre);
+    void eliminarContenidoDeListaPersonalizada(Long usuarioId, Long contenidoId, String nombre);
 }

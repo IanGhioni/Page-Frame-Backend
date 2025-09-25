@@ -12,6 +12,4 @@ public interface ContenidoDeUsuarioPersonalizadoDAO extends JpaRepository<Conten
     @Query("from ContenidoDeUsuarioPersonalizado cdup where cdup.usuario.id = :usuarioId and cdup.nombre = :nombre")
     ContenidoDeUsuarioPersonalizado findByUsuarioIdAndNombre(Long usuarioId, String nombre);
 
-    @Query("from ContenidoDeUsuarioPersonalizado cdup where cdup.usuario.id = :usuarioId and cdup.nombre = :nombre")
-    Set<Contenido> findContenidoDeUsuarioPersonalizadoByUsuarioIdAndNombre(Long usuarioId, String nombre);
 }
