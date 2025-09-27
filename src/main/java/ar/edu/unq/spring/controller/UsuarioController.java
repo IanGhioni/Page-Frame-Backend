@@ -85,9 +85,9 @@ public class UsuarioController {
                 .collect(Collectors.toSet());
     }
 
-    @DeleteMapping("/{idUser}/eliminar/{contenido}/DeListaPersonalizada/{nombre}")
-    public void eliminarContenidoDeListaPersonalizada(@PathVariable Long idUser, @PathVariable Contenido contenido, @PathVariable String nombre) {
-        usuarioService.eliminarContenidoDeListaPersonalizada(idUser, contenido.getId(), nombre);
+    @DeleteMapping("/{idUser}/eliminar/{contenidoId}/DeListaPersonalizada/{nombre}")
+    public void eliminarContenidoDeListaPersonalizada(@PathVariable Long idUser, @PathVariable Long contenidoId, @PathVariable String nombre) {
+        usuarioService.eliminarContenidoDeListaPersonalizada(idUser, contenidoId, nombre);
     }
 
     @DeleteMapping("/{idUser}/eliminar/listaPersonalizada/{nombre}")
