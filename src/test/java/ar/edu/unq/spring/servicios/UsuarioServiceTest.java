@@ -243,6 +243,24 @@ public class UsuarioServiceTest {
         assertThrows(ListaExistenteException.class, () -> usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros"));
     }
 
+    @Test
+    void testSePuedeAgregarUnMismoContenidoA2ListasPersonalizadas() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        usuarioService.crearListaPersonalizada(ornePers.getId(), "contenidoFav", "libros y pelis que cambiaron mi vida");
+        usuarioService.crearListaPersonalizada(ornePers.getId(), "favoritos", "lista de pelis y libros");
+
+        usuarioService.agregarContenidoAListaPersonalizada(ornePers.getId(), madagascar.getId(), "contenidoFav");
+        usuarioService.agregarContenidoAListaPersonalizada(ornePers.getId(), madagascar.getId(), "favoritos");
+
+        Set<Contenido> lista1 = usuarioService.getContenidosDeListaPersonalizada(ornePers.getId(), "contenidoFav");
+        Set<Contenido> lista2 = usuarioService.getContenidosDeListaPersonalizada(ornePers.getId(), "favoritos");
+
+        assertEquals(1, lista1.size());
+        assertEquals(1, lista2.size());
+    }
+
     @AfterEach
         void clean () {
             testService.cleanUp();

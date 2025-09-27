@@ -17,7 +17,7 @@ public class ContenidoDeUsuarioPersonalizado {
     @ManyToOne
     private Usuario usuario;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<Contenido> contenido;
 
     private String nombre;
