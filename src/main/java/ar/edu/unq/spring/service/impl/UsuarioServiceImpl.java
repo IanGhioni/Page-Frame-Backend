@@ -1,6 +1,7 @@
 package ar.edu.unq.spring.service.impl;
 
 import ar.edu.unq.spring.exception.ContenidoNoEncontradoException;
+import ar.edu.unq.spring.exception.ListaExistenteException;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuario;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuarioPersonalizado;
@@ -97,10 +98,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public void crearListaPersonalizada(Long usuarioId, String nombre, String descripcion){
+    public void crearListaPersonalizada(Long usuarioId, String nombre, String descripcion) {
         Usuario usuario = usuarioDAO.findById(usuarioId).orElseThrow(UsuarioNoEncontrado::new);
-        usuario.agregarListaPersonalizada(nombre, descripcion);
-        usuarioDAO.save(usuario);
+        if (usuario.yaExisteListaDeNombre(nombre)) {
+            throw new ListaExistenteException();
+        } else {
+            usuario.agregarListaPersonalizada(nombre, descripcion);
+            usuarioDAO.save(usuario);
+        }
     }
 
     @Override

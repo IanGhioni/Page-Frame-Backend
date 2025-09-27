@@ -89,6 +89,11 @@ public class Usuario implements UserDetails {
             listasPersonalizadas.remove(lista);
     }
 
+    public boolean yaExisteListaDeNombre(String nombre) {
+        ContenidoDeUsuarioPersonalizado lista = this.listasPersonalizadas.stream().filter(cdup -> cdup.getNombre().equals(nombre)).findFirst().orElse(null);
+        return (lista != null);
+    }
+
     //Metodos de la interfaz UserDetailes aca debajo (No tocar por favorcito)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

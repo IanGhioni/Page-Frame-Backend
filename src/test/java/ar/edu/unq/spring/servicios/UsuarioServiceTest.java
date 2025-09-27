@@ -1,5 +1,6 @@
 package ar.edu.unq.spring.servicios;
 
+import ar.edu.unq.spring.exception.ListaExistenteException;
 import ar.edu.unq.spring.jwt.JWTRole;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuarioPersonalizado;
@@ -232,6 +233,14 @@ public class UsuarioServiceTest {
         Set<Contenido> lista = usuarioService.getContenidosDeListaPersonalizada(actualizado.getId(), "favoritos");
 
         assertEquals(1, lista.size());
+    }
+
+    @Test
+    void testNoSePuedeCrearListasPersonalizadasConMismoNombre() {
+        Usuario usuario = usuarioService.crear(new Usuario("orne1", "orne1@gmail.com", "Orne1235678!!", JWTRole.USER, "panda"));
+
+        usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros");
+        assertThrows(ListaExistenteException.class, () -> usuarioService.crearListaPersonalizada(usuario.getId(), "favoritos", "lista de pelis y libros"));
     }
 
     @AfterEach
