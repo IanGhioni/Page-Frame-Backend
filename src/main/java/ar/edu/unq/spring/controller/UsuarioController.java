@@ -7,6 +7,7 @@ import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -75,6 +76,13 @@ public class UsuarioController {
                         lista.getNombre(),
                         lista.getDescripcion()))
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/{idUser}/getContenidoDeListaPersonalizada/{nombreLista}")
+    public Set<ContenidoResponseDTO> getContenidosDeListaPersonalizada(@PathVariable Long idUser, @PathVariable String nombreLista) {
+        return usuarioService.getContenidosDeListaPersonalizada(idUser, nombreLista).stream()
+                .map(ContenidoResponseDTO::desdeModelo)
+                .collect(Collectors.toSet());
     }
 
     @DeleteMapping("/{idUser}/eliminar/{contenido}/DeListaPersonalizada/{nombre}")
