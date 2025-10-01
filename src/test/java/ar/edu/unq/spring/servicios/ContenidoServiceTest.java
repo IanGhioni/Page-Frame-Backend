@@ -11,6 +11,7 @@ import ar.edu.unq.spring.testService.TestService;
 import ar.edu.unq.spring.testService.TestServiceConfig;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -285,6 +286,95 @@ public class ContenidoServiceTest {
         contenidoService.eliminarValoracionContenido(velocipastor.getId(), usuario.getId());
         var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
         assertEquals(0, contenidoRecuperado.getReviews().size());
+    }
+
+    @Test
+    void testBuscarPorNombreDeAutoresConUnSoloContenido() {
+        Contenido madagascar = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar", "Eric Darnell, Tom McGrath", 2005, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 465000, 6.9, 86);
+        contenidoService.crear(madagascar);
+
+        var pagina =  contenidoService.recuperarPorNombreDeAutores("Eric Darnell", 0, 1);
+        Assertions.assertEquals(1, pagina.getTotalPages());
+        Assertions.assertEquals(1, pagina.get().toList().size());
+        Assertions.assertEquals("Madagascar", pagina.stream().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Eric Darnell, Tom McGrath", pagina.stream().toList().getFirst().getAutores());
+    }
+
+    @Test
+    void testBuscarPorNombreDeAutoresConVariosContenidos() {
+        Contenido madagascar = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar", "Eric Darnell, Tom McGrath", 2005, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 465000, 6.9, 86);
+        Contenido madagascar2 = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar 2", "Eric Darnell", 2008, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 300000, 6.9, 86);
+        contenidoService.crear(madagascar);
+        contenidoService.crear(madagascar2);
+
+        var pagina =  contenidoService.recuperarPorNombreDeAutores("Eric Darnell", 0, 2);
+        Assertions.assertEquals(1, pagina.getTotalPages());
+        Assertions.assertEquals(2, pagina.get().toList().size());
+        Assertions.assertEquals("Madagascar 2", pagina.stream().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Eric Darnell", pagina.stream().toList().getFirst().getAutores());
+
+        Assertions.assertEquals("Madagascar", pagina.stream().toList().getLast().getTitulo());
+        Assertions.assertEquals("Eric Darnell, Tom McGrath", pagina.stream().toList().getLast().getAutores());
+    }
+
+    @Test
+    void testBuscarPorNombreDeAutoresArrojaErrorAlBuscarConPaginaMenorA0() {
+        assertThrows(NroDePaginaInvalidoException.class, () -> {
+            contenidoService.recuperarPorNombreDeAutores("Saraza", -1, 5);
+        });
+    }
+
+    @Test
+    void testBuscarPorNombreDeAutoresArrojaErrorAlBuscarConTamanioPaginaMenorA1() {
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> {
+            contenidoService.recuperarPorNombreDeAutores("Saraza", 1, 0);
+        });
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> {
+            contenidoService.recuperarPorNombreDeAutores("Saraza", 1, -1);
+        });
+    }
+
+    @Test
+    void testBuscarPorNombreDeAutoresConVariosContenidosYVariasPaginas() {
+        Contenido madagascar = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar", "Eric Darnell, Tom McGrath", 2005, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 465000, 6.9, 86);
+        Contenido madagascar2 = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar 2", "Eric Darnell", 2008, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 300000, 6.9, 86);
+        contenidoService.crear(madagascar);
+        contenidoService.crear(madagascar2);
+
+        var pagina =  contenidoService.recuperarPorNombreDeAutores("r", 0, 2);
+        var pagina2 =  contenidoService.recuperarPorNombreDeAutores("r", 1, 2);
+        var pagina3 =  contenidoService.recuperarPorNombreDeAutores("r", 2, 2);
+
+        var contenidoPaginaUno  = pagina.get().toList();
+        var contenidoPaginaDos  = pagina2.get().toList();
+        var contenidoPaginaTres = pagina3.get().toList();
+
+
+        Assertions.assertEquals(3, pagina.getTotalPages());
+        Assertions.assertEquals(5, pagina.getTotalElements());
+
+        Assertions.assertEquals(2, contenidoPaginaUno.size());
+        Assertions.assertEquals(2, contenidoPaginaDos.size());
+        Assertions.assertEquals(1, contenidoPaginaTres.size());
+    }
+
+    @Test
+    void buscarPorCreadorSinCoincidenciasRetornaVacio() {
+        var pagina =  contenidoService.recuperarPorNombreDeAutores("RRRRRRR", 0, 10);
+
+        Assertions.assertEquals(0, pagina.getTotalPages());
+        Assertions.assertEquals(0, pagina.getTotalElements());
+        Assertions.assertEquals(0, pagina.get().toList().size());
     }
 
 

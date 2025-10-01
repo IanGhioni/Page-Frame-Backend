@@ -80,6 +80,16 @@ public class ContenidoServiceImpl implements ContenidoService {
     }
 
     @Override
+    public Page<Contenido> recuperarPorNombreDeAutores(String autor, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("autores").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByAutores(autor, p);
+
+        return page;
+    }
+
+    @Override
     public Page<Contenido> explorarContenidoPopular(int nroPagina, int tamanioPorPagina) {
         this.validarPaginacion(nroPagina, tamanioPorPagina);
 
