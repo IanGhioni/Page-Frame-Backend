@@ -18,4 +18,5 @@ public interface ContenidoService {
     Page<Contenido> explorarContenidoPopular(int pagina, int tamanioPorPagina);
     void valorarContenido(Long contenidoId, Double valoracion, Long usuarioId);
     void eliminarValoracionContenido(Long contenidoId, Long usuarioId);
+    Page<Contenido> recuperarPorNombreDeAutores(String nombre, int nroPagina, int tamanioPorPagina);
 }

@@ -75,4 +75,11 @@ public class ContenidoControllerREST {
     public void eliminarValoracion(@PathVariable Long contenidoId, @PathVariable Long usuarioId) {
         contenidoService.eliminarValoracionContenido(contenidoId, usuarioId);
     }
+
+    @GetMapping("/searchAutores")
+    public PageContenidoDTO searchContenidoPorAutores(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorNombreDeAutores(nombre, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
 }

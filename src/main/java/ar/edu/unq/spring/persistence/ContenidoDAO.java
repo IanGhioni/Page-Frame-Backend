@@ -20,8 +20,29 @@ public interface ContenidoDAO extends JpaRepository<Contenido, Long> {
     @Query("from Contenido c order by c.autores ASC")
     List<Contenido> contenidoOrdPorAutoresAsc();
 
-//    @Query("from Contenido c where c.titulo ilike %:name% order by c.ratingCount desc ")
-//    Page<Contenido> findByTituloContaining(@Param("name") String titulo, Pageable pageable);
+    @Query(
+            value = """
+        select *
+        from contenido c
+        where c.autores ilike '%' || :name || '%'
+        order by 
+          (case
+            when c.autores ilike :name then 1
+            when c.autores ilike :name || '%' then 2
+            when c.autores ilike '% ' || :name || ' %' then 3
+            when c.autores ilike '%' || :name || '%' then 4
+            else 5
+          end),
+          c.rating_count desc
+        """,
+            countQuery = """
+        select count(*)
+        from contenido c
+        where c.autores ilike '%' || :name || '%'
+        """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByAutores(@Param("name") String nombre, Pageable pageable);
 
     @Query(
             value = """
