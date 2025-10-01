@@ -21,12 +21,20 @@ public class Review {
 
     private Double valoracion;
 
+    private String texto;
+
     public Review() {}
 
     public Review(Usuario usuario, Contenido contenido, Double valoracion) {
         this.usuario = usuario;
         this.contenido = contenido;
         this.valoracion = valoracion;
+    }
+
+    public Review(Usuario usuario, Contenido contenido, String texto) {
+        this.usuario = usuario;
+        this.contenido = contenido;
+        this.texto = texto;
     }
 
 }

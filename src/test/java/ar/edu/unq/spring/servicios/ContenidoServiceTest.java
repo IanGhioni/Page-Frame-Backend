@@ -1,11 +1,9 @@
 package ar.edu.unq.spring.servicios;
 
+import ar.edu.unq.spring.exception.*;
 import ar.edu.unq.spring.jwt.JWTRole;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.Usuario;
-import ar.edu.unq.spring.exception.ContenidoNoEncontradoException;
-import ar.edu.unq.spring.exception.NroDePaginaInvalidoException;
-import ar.edu.unq.spring.exception.TamanioDePaginaInvalidoException;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import ar.edu.unq.spring.testService.TestService;
 import ar.edu.unq.spring.testService.TestServiceConfig;
@@ -375,6 +373,87 @@ public class ContenidoServiceTest {
         Assertions.assertEquals(0, pagina.getTotalPages());
         Assertions.assertEquals(0, pagina.getTotalElements());
         Assertions.assertEquals(0, pagina.get().toList().size());
+    }
+
+    @Test
+    void testNoSePuedeEscribirReviewSiNoEstaValorada() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        assertThrows(ReviewSinValoracion.class, () -> contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), "Prueba"));
+    }
+
+    @Test
+    void testEscribirReviewNoExplotaSiEstaValorada() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, ornePers.getId());
+
+        Assertions.assertDoesNotThrow(() -> contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), "Prueba"));
+    }
+
+    @Test
+    void testNoSePuedeEscribirReviewSinTextoDeReview() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        assertThrows(CuerpoDeReviewInvalido.class, () -> contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), ""));
+    }
+
+    @Test
+    void testUsuarioEscribeReview() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, ornePers.getId());
+        contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), "Prueba");
+        var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+
+        Assertions.assertEquals(1, contenidoRecuperado.getReviews().size());
+        Assertions.assertNotNull(contenidoRecuperado.getReviews().getFirst().getId());
+        Assertions.assertEquals("Prueba", contenidoRecuperado.getReviews().getFirst().getTexto());
+    }
+
+    @Test
+    void testUsuarioEscribeReviewEn2Contenidos() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, ornePers.getId());
+        contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), "Prueba velocipastor");
+        contenidoService.valorarContenido(percyJackson.getId(), 5.0, ornePers.getId());
+        contenidoService.escribirReview(percyJackson.getId(), ornePers.getId(), "Prueba percy");
+
+        var velocipastorRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+        var percyRecuperado = contenidoService.recuperar(percyJackson.getId()).get();
+
+        Assertions.assertEquals(1, velocipastorRecuperado.getReviews().size());
+        Assertions.assertNotNull(velocipastorRecuperado.getReviews().getFirst().getId());
+        Assertions.assertEquals("Prueba velocipastor", velocipastorRecuperado.getReviews().getFirst().getTexto());
+        Assertions.assertEquals(1, percyRecuperado.getReviews().size());
+        Assertions.assertNotNull(percyRecuperado.getReviews().getFirst().getId());
+        Assertions.assertEquals("Prueba percy", percyRecuperado.getReviews().getFirst().getTexto());
+    }
+
+    @Test
+    void test2UsuariosEscribenReview() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        Usuario ian = new Usuario("ian", "ian@gmail.com", "Iancho1235678!!", JWTRole.USER, "panda");
+        Usuario ianePers = usuarioService.crear(ian);
+
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, ornePers.getId());
+        contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), "Prueba Orne");
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, ianePers.getId());
+        contenidoService.escribirReview(velocipastor.getId(), ianePers.getId(), "Prueba Ian");
+
+        var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+
+        Assertions.assertEquals(2, contenidoRecuperado.getReviews().size());
+        Assertions.assertEquals("Prueba Orne", contenidoRecuperado.getReviews().get(0).getTexto());
+        Assertions.assertEquals("Prueba Ian", contenidoRecuperado.getReviews().get(1).getTexto());
     }
 
 

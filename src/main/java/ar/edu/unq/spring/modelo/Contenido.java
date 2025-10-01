@@ -77,13 +77,13 @@ public class Contenido {
         this.ratingAverage = ratingAverage;
         this.largo = largo;
     }
-    public void eliminarReview(Usuario usuario) {
+    public void eliminarValoracion(Usuario usuario) {
         this.reviews.removeIf(review -> review.getUsuario().getId().equals(usuario.getId()));
         this.ratingCount-=1;
         this.actualizarRatingPromedio();
     }
 
-    public void agregarOActualizarReview(Usuario usuario, Double valoracion) {
+    public void agregarOActualizarValoracion(Usuario usuario, Double valoracion) {
         boolean reviewExistente = this.reviews.stream()
                 .filter(review -> review.getUsuario().getId().equals(usuario.getId()))
                 .findFirst()
@@ -110,5 +110,15 @@ public class Contenido {
             totalReviews += this.reviews.stream().mapToDouble(Review::getValoracion).sum(); //le sumo las nuetras
             this.ratingAverage = totalReviews / this.ratingCount;
         }
+    }
+
+    public void agregarOActualizarReview(Usuario usuario, String texto) {
+        this.reviews.stream()
+                .filter(review -> review.getUsuario().getId().equals(usuario.getId()))
+                .findFirst()
+                .map(review -> {
+                    review.setTexto(texto); // Actualiza si existe
+                    return true;
+                }).orElseThrow();
     }
 }

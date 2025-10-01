@@ -3,6 +3,7 @@ package ar.edu.unq.spring.controller;
 import ar.edu.unq.spring.controller.dto.ContenidoBodyDTO;
 import ar.edu.unq.spring.controller.dto.ContenidoResponseDTO;
 import ar.edu.unq.spring.controller.dto.PageContenidoDTO;
+import ar.edu.unq.spring.controller.dto.TextoReviewDTO;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.exception.ContenidoNoEncontradoException;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
@@ -70,6 +71,12 @@ public class ContenidoControllerREST {
     public void valorarContenido(@PathVariable Long contenidoId, @PathVariable Double valoracion, @PathVariable Long usuarioId) {
         contenidoService.valorarContenido(contenidoId, valoracion, usuarioId);
     }
+
+    @PostMapping("/escribirReview/{contenidoId}/{usuarioId}")
+    public void escribirReview(@PathVariable Long contenidoId, @PathVariable Long usuarioId, @RequestBody TextoReviewDTO textoDTO) {
+        contenidoService.escribirReview(contenidoId, usuarioId, textoDTO.text());
+    }
+
 
     @DeleteMapping("/{contenidoId}/eliminarValoracion/{usuarioId}")
     public void eliminarValoracion(@PathVariable Long contenidoId, @PathVariable Long usuarioId) {
