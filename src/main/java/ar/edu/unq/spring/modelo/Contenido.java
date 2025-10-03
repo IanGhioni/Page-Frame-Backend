@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,7 +120,9 @@ public class Contenido {
                 .filter(review -> review.getUsuario().getId().equals(usuario.getId()))
                 .findFirst()
                 .map(review -> {
-                    review.setTexto(texto); // Actualiza si existe
+                    review.setTexto(texto);
+                    review.setFecha(LocalDate.now());
+                    review.setHora(LocalTime.now().truncatedTo(ChronoUnit.MINUTES));
                     return true;
                 }).orElseThrow();
     }

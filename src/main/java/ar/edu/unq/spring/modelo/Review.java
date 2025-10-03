@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Entity
 @Setter
 @Getter
@@ -23,6 +26,9 @@ public class Review {
 
     private String texto;
 
+    private LocalDate fecha;
+    private LocalTime hora;
+
     public Review() {}
 
     public Review(Usuario usuario, Contenido contenido, Double valoracion) {
@@ -30,11 +36,4 @@ public class Review {
         this.contenido = contenido;
         this.valoracion = valoracion;
     }
-
-    public Review(Usuario usuario, Contenido contenido, String texto) {
-        this.usuario = usuario;
-        this.contenido = contenido;
-        this.texto = texto;
-    }
-
 }
