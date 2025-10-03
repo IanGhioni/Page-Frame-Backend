@@ -1,10 +1,8 @@
 package ar.edu.unq.spring.service.impl;
 
+import ar.edu.unq.spring.exception.*;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.Usuario;
-import ar.edu.unq.spring.exception.ContenidoNoEncontradoException;
-import ar.edu.unq.spring.exception.NroDePaginaInvalidoException;
-import ar.edu.unq.spring.exception.TamanioDePaginaInvalidoException;
 import ar.edu.unq.spring.persistence.ContenidoDAO;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
@@ -15,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -105,7 +104,25 @@ public class ContenidoServiceImpl implements ContenidoService {
                 .orElseThrow(ContenidoNoEncontradoException::new);
         Usuario usuario = this.usuarioService.recuperar(usuarioId);
 
-        contenido.agregarOActualizarReview(usuario, valoracion);
+        contenido.agregarOActualizarValoracion(usuario, valoracion);
+        this.contenidoDAO.save(contenido);
+    }
+
+    @Override
+    public void escribirReview(Long contenidoId, Long usuarioId, String texto) {
+        if (texto == null || texto.isEmpty()) {
+            throw new CuerpoDeReviewInvalido();
+        }
+
+        Contenido contenido = this.contenidoDAO.findById(contenidoId)
+                .orElseThrow(ContenidoNoEncontradoException::new);
+        Usuario usuario = this.usuarioService.recuperar(usuarioId);
+
+        try {
+            contenido.agregarOActualizarReview(usuario, texto);
+        } catch (NoSuchElementException e) {
+            throw new ReviewSinValoracion();
+        }
         this.contenidoDAO.save(contenido);
     }
 
@@ -114,7 +131,7 @@ public class ContenidoServiceImpl implements ContenidoService {
         Contenido contenido = this.contenidoDAO.findById(contenidoId
         ).orElseThrow(ContenidoNoEncontradoException::new);
         Usuario usuario = this.usuarioService.recuperar(usuarioId);
-        contenido.eliminarReview(usuario);
+        contenido.eliminarValoracion(usuario);
         this.contenidoDAO.save(contenido);
 
     }

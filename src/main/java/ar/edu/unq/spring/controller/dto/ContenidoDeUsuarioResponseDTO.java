@@ -12,7 +12,7 @@ public record ContenidoDeUsuarioResponseDTO(Long idUser, String estado, Long id,
                 contenidoDeUsuario.getContenido().getTitulo(),
                 contenidoDeUsuario.getContenido().getAutores(),
                 contenidoDeUsuario.getContenido().getRatingAverage(),
-                contenidoDeUsuario.getContenido().getRatingAverage(),
+                contenidoDeUsuario.getContenido().getRatingCount(),
                 contenidoDeUsuario.getContenido().getPublicacion(),
                 contenidoDeUsuario.getContenido().getIsbn(),
                 contenidoDeUsuario.getContenido().getReviews().stream().map(ReviewResponseDTO::fromModel).toList()

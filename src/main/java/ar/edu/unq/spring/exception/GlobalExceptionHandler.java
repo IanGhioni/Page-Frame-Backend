@@ -32,4 +32,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleListaExistenteException(ListaExistenteException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(CuerpoDeReviewInvalido.class)
+    public ResponseEntity<String> handleCuerpoDeReviewInvalido(CuerpoDeReviewInvalido ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ReviewSinValoracion.class)
+    public ResponseEntity<String> handleReviewSinValoracion(ReviewSinValoracion ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
