@@ -126,4 +126,15 @@ public class Contenido {
                     return true;
                 }).orElseThrow();
     }
+
+    public void eliminarTextoReview(Usuario usuario) {
+        this.reviews.stream()
+                .filter(review -> review.getUsuario().getId().equals(usuario.getId()))
+                .findFirst()
+                .ifPresent(review -> {
+                    review.setTexto(null);
+                    review.setFecha(null);
+                    review.setHora(null);
+                });
+    }
 }

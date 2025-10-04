@@ -20,4 +20,5 @@ public interface ContenidoService {
     void eliminarValoracionContenido(Long contenidoId, Long usuarioId);
     Page<Contenido> recuperarPorNombreDeAutores(String nombre, int nroPagina, int tamanioPorPagina);
     void escribirReview(Long contenidoId, Long usuarioId, String text);
+    void eliminarReview(Long contenidoId, Long usuarioId);
 }

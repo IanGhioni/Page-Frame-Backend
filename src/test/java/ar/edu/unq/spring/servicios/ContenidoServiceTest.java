@@ -456,6 +456,27 @@ public class ContenidoServiceTest {
         Assertions.assertEquals("Prueba Ian", contenidoRecuperado.getReviews().get(1).getTexto());
     }
 
+    @Test
+    void testEliminarReviewPeroNoValoracion() {
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, usuario.getId());
+        contenidoService.escribirReview(velocipastor.getId(), usuario.getId(), "Mejor pelicula de la historia");
+
+        var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+
+        assertEquals(1, contenidoRecuperado.getReviews().size());
+        assertNotNull(contenidoRecuperado.getReviews().getFirst().getId());
+        assertEquals("Mejor pelicula de la historia", contenidoRecuperado.getReviews().getFirst().getTexto());
+
+        contenidoService.eliminarReview(velocipastor.getId(), usuario.getId());
+
+        var contenidoRecuperado2 = contenidoService.recuperar(velocipastor.getId()).get();
+
+        assertEquals(1, contenidoRecuperado2.getReviews().size());
+        assertNotNull(contenidoRecuperado2.getReviews().getFirst().getId());
+        assertNull(contenidoRecuperado2.getReviews().getFirst().getTexto());
+        assertNull(contenidoRecuperado2.getReviews().getFirst().getFecha());
+        assertNull(contenidoRecuperado2.getReviews().getFirst().getHora());
+    }
 
     @AfterEach
     void cleanUp() {
