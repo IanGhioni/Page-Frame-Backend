@@ -144,4 +144,15 @@ public class ContenidoServiceImpl implements ContenidoService {
             throw new TamanioDePaginaInvalidoException();
         }
     }
+
+    @Override
+    public void eliminarReview(Long contenidoId, Long usuarioId) {
+        Contenido contenido = this.contenidoDAO.findById(contenidoId)
+                .orElseThrow(ContenidoNoEncontradoException::new);
+        Usuario usuario = this.usuarioService.recuperar(usuarioId);
+
+       contenido.eliminarTextoReview(usuario);
+
+        this.contenidoDAO.save(contenido);
+    }
 }
