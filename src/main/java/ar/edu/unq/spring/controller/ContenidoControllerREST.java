@@ -83,6 +83,11 @@ public class ContenidoControllerREST {
         contenidoService.eliminarValoracionContenido(contenidoId, usuarioId);
     }
 
+    @DeleteMapping("/{contenidoId}/eliminarReview/{usuarioId}")
+    public void eliminarReview(@PathVariable Long contenidoId, @PathVariable Long usuarioId) {
+        contenidoService.eliminarReview(contenidoId, usuarioId);
+    }
+
     @GetMapping("/searchAutores")
     public PageContenidoDTO searchContenidoPorAutores(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
         Page<Contenido> p = contenidoService.recuperarPorNombreDeAutores(nombre, nroPagina, tamanioPagina);
