@@ -478,6 +478,142 @@ public class ContenidoServiceTest {
         assertNull(contenidoRecuperado2.getReviews().getFirst().getHora());
     }
 
+    @Test
+    public void buscarPorNombreSoloLibrosNroPaginaInvalidoArrojaException() {
+        assertThrows(NroDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloLibros("Nombre", -1, 10));
+    }
+
+    @Test
+    public void buscarPorNombreSoloPelisNroPaginaInvalidoArrojaException() {
+        assertThrows(NroDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloPeliculas("Nombre", -1, 10));
+    }
+
+    @Test
+    public void buscarPorNombreSoloLibrosTamanioPaginaInvalidoArrojaException() {
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloLibros("Nombre", 0, 0));
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloLibros("Nombre", 0, -1));
+    }
+
+    @Test
+    public void buscarPorNombreSoloPelisTamanioPaginaInvalidoArrojaException() {
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloPeliculas("Nombre", 0, 0));
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloPeliculas("Nombre", 0, -1));
+    }
+
+    @Test void buscarPorNombreSoloLibrosSoloTraeLibros() {
+        contenidoService.crear(new Contenido(null, "imagen",
+                                        "Nombre de pelicula", "Autor", 2002, "Descripcion",
+                                        "Comedia", 210, 4, 120));
+
+        contenidoService.crear(new Contenido("9789505470631", "imagen",
+                "Nombre de libro", "Autor", 2002, "Descripcion",
+                "Terror", 1422, 5, 1000));
+
+        Page<Contenido> p = contenidoService.recuperarPorNombreSoloLibros("Nombre de", 0, 5);
+
+        Assertions.assertEquals(1, p.getTotalElements());
+        Assertions.assertNotNull(p.get().toList().getFirst().getIsbn());
+        Assertions.assertEquals("Nombre de libro", p.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals(1, p.getTotalPages());
+    }
+
+    @Test void buscarPorNombreSoloPeliculasSoloTraePeliculas() {
+        contenidoService.crear(new Contenido(null, "imagen",
+                "Nombre de pelicula", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 4, 120));
+
+        contenidoService.crear(new Contenido("9789505470631", "imagen",
+                "Nombre de libro", "Autor", 2002, "Descripcion",
+                "Drama", 1422, 5, 1000));
+
+        Page<Contenido> p = contenidoService.recuperarPorNombreSoloPeliculas("Nombre de", 0, 5);
+
+        Assertions.assertEquals(1, p.getTotalElements());
+        Assertions.assertNull(p.get().toList().getFirst().getIsbn());
+        Assertions.assertEquals("Nombre de pelicula", p.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals(1, p.getTotalPages());
+    }
+
+    @Test void buscarPorNombreSoloPeliculasTraeElContenidoPaginado() {
+        contenidoService.crear(new Contenido(null, "imagen",
+                "Nombre de pelicula 1", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 5, 120));
+        contenidoService.crear(new Contenido(null, "imagen",
+                "Nombre de pelicula 2", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 4, 120));
+        contenidoService.crear(new Contenido(null, "imagen",
+                "Nombre de pelicula 3", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 3, 120));
+        contenidoService.crear(new Contenido(null, "imagen",
+                "Nombre de pelicula 4", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 2, 120));
+        contenidoService.crear(new Contenido(null, "imagen",
+                "Nombre de pelicula 5", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 1, 120));
+
+
+        Page<Contenido> p1 = contenidoService.recuperarPorNombreSoloPeliculas("Nombre de", 0, 3);
+        Page<Contenido> p2 = contenidoService.recuperarPorNombreSoloPeliculas("Nombre de", 1, 3);
+
+
+        Assertions.assertEquals(5, p1.getTotalElements());
+        Assertions.assertEquals("Nombre de pelicula 1", p1.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Nombre de pelicula 2", p1.get().toList().get(1).getTitulo());
+        Assertions.assertEquals("Nombre de pelicula 3", p1.get().toList().get(2).getTitulo());
+        Assertions.assertEquals(5, p2.getTotalElements());
+        Assertions.assertEquals("Nombre de pelicula 4", p2.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Nombre de pelicula 5", p2.get().toList().get(1).getTitulo());
+    }
+
+    @Test void buscarPorNombreSoloLibrosTraeElContenidoPaginado() {
+        contenidoService.crear(new Contenido("9789505470631", "imagen",
+                "Nombre de libro 1", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 5, 120));
+        contenidoService.crear(new Contenido("9789505470632", "imagen",
+                "Nombre de libro 2", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 4, 120));
+        contenidoService.crear(new Contenido("9789505470633", "imagen",
+                "Nombre de libro 3", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 3, 120));
+        contenidoService.crear(new Contenido("9789505470634", "imagen",
+                "Nombre de libro 4", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 2, 120));
+        contenidoService.crear(new Contenido("9789505470635", "imagen",
+                "Nombre de libro 5", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 1, 120));
+
+
+        Page<Contenido> p1 = contenidoService.recuperarPorNombreSoloLibros("Nombre de", 0, 3);
+        Page<Contenido> p2 = contenidoService.recuperarPorNombreSoloLibros("Nombre de", 1, 3);
+
+
+        Assertions.assertEquals(5, p1.getTotalElements());
+        Assertions.assertEquals("Nombre de libro 1", p1.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Nombre de libro 2", p1.get().toList().get(1).getTitulo());
+        Assertions.assertEquals("Nombre de libro 3", p1.get().toList().get(2).getTitulo());
+        Assertions.assertEquals(5, p2.getTotalElements());
+        Assertions.assertEquals("Nombre de libro 4", p2.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Nombre de libro 5", p2.get().toList().get(1).getTitulo());
+    }
+
+    @Test
+    public void buscarPorNombreSoloLibrosSinCoincidencias() {
+        Page<Contenido> p1 = contenidoService.recuperarPorNombreSoloLibros("Nombre de libro que no existe", 0, 3);
+
+        Assertions.assertEquals(0, p1.getTotalElements());
+        Assertions.assertEquals(0, p1.getTotalPages());
+        Assertions.assertTrue(p1.isEmpty());
+    }
+
+    @Test
+    public void buscarPorNombreSoloPeliculasSinCoincidencias() {
+        Page<Contenido> p1 = contenidoService.recuperarPorNombreSoloPeliculas("Nombre de peli que no existe", 0, 3);
+
+        Assertions.assertEquals(0, p1.getTotalElements());
+        Assertions.assertEquals(0, p1.getTotalPages());
+        Assertions.assertTrue(p1.isEmpty());
+    }
+
     @AfterEach
     void cleanUp() {
         testService.cleanUp();

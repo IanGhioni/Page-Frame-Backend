@@ -71,4 +71,58 @@ public interface ContenidoDAO extends JpaRepository<Contenido, Long> {
 
     @Query("from Contenido c order by c.ratingCount desc ")
     Page<Contenido> contenidoOrdPorRatingCount(@Param("name") Pageable pageable);
+
+
+    @Query(
+            value = """
+        select *
+        from contenido c
+        where c.titulo ilike '%' || :name || '%' and c.isbn is not null and c.isbn != ''
+        order by 
+          (case
+            when c.titulo ilike :name then 1
+            when c.titulo ilike :name || '%' then 2
+            when c.titulo ilike '% ' || :name || ' %' then 3
+            when c.titulo ilike '%' || :name || '%' then 4
+            else 5
+          end),
+          c.rating_count desc
+        """,
+            countQuery = """
+        select count(*)
+        from contenido c
+        where c.titulo ilike '%' || :name || '%'
+        """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByTituloOnlyBooks(@Param("name") String titulo, Pageable pageable);
+
+    @Query(
+            value = """
+        select *
+        from contenido c
+        where c.titulo ilike '%' || :name || '%' and c.isbn = ''
+        order by 
+          (case
+            when c.titulo ilike :name then 1
+            when c.titulo ilike :name || '%' then 2
+            when c.titulo ilike '% ' || :name || ' %' then 3
+            when c.titulo ilike '%' || :name || '%' then 4
+            else 5
+          end),
+          c.rating_count desc
+        """,
+            countQuery = """
+        select count(*)
+        from contenido c
+        where c.titulo ilike '%' || :name || '%'
+        """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByTituloOnlyMovies(@Param("name") String titulo, Pageable pageable);
 }
+/*
+
+
+
+* */

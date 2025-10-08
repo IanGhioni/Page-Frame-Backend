@@ -155,4 +155,22 @@ public class ContenidoServiceImpl implements ContenidoService {
 
         this.contenidoDAO.save(contenido);
     }
+
+    @Override
+    public Page<Contenido> recuperarPorNombreSoloLibros(String nombre, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("titulo").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByTituloOnlyBooks(nombre, p);
+
+        return page;
+    }
+
+    @Override
+    public Page<Contenido> recuperarPorNombreSoloPeliculas(String nombre, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("titulo").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByTituloOnlyMovies(nombre, p);
+
+        return page;
+    }
 }
