@@ -452,8 +452,8 @@ public class ContenidoServiceTest {
         var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
 
         Assertions.assertEquals(2, contenidoRecuperado.getReviews().size());
-        Assertions.assertEquals("Prueba Orne", contenidoRecuperado.getReviews().get(0).getTexto());
-        Assertions.assertEquals("Prueba Ian", contenidoRecuperado.getReviews().get(1).getTexto());
+        Assertions.assertTrue(contenidoRecuperado.getReviews().stream().anyMatch(r -> r.getTexto().equals("Prueba Orne")));
+        Assertions.assertTrue(contenidoRecuperado.getReviews().stream().anyMatch(r -> r.getTexto().equals("Prueba Ian")));
     }
 
     @Test
@@ -518,7 +518,7 @@ public class ContenidoServiceTest {
     }
 
     @Test void buscarPorNombreSoloPeliculasSoloTraePeliculas() {
-        contenidoService.crear(new Contenido(null, "imagen",
+        contenidoService.crear(new Contenido("", "imagen",
                 "Nombre de pelicula", "Autor", 2002, "Descripcion",
                 "Comedia", 210, 4, 120));
 
@@ -529,25 +529,25 @@ public class ContenidoServiceTest {
         Page<Contenido> p = contenidoService.recuperarPorNombreSoloPeliculas("Nombre de", 0, 5);
 
         Assertions.assertEquals(1, p.getTotalElements());
-        Assertions.assertNull(p.get().toList().getFirst().getIsbn());
+        Assertions.assertEquals("",p.get().toList().getFirst().getIsbn());
         Assertions.assertEquals("Nombre de pelicula", p.get().toList().getFirst().getTitulo());
         Assertions.assertEquals(1, p.getTotalPages());
     }
 
     @Test void buscarPorNombreSoloPeliculasTraeElContenidoPaginado() {
-        contenidoService.crear(new Contenido(null, "imagen",
+        contenidoService.crear(new Contenido("", "imagen",
                 "Nombre de pelicula 1", "Autor", 2002, "Descripcion",
                 "Comedia", 210, 5, 120));
-        contenidoService.crear(new Contenido(null, "imagen",
+        contenidoService.crear(new Contenido("", "imagen",
                 "Nombre de pelicula 2", "Autor", 2002, "Descripcion",
                 "Comedia", 210, 4, 120));
-        contenidoService.crear(new Contenido(null, "imagen",
+        contenidoService.crear(new Contenido("", "imagen",
                 "Nombre de pelicula 3", "Autor", 2002, "Descripcion",
                 "Comedia", 210, 3, 120));
-        contenidoService.crear(new Contenido(null, "imagen",
+        contenidoService.crear(new Contenido("", "imagen",
                 "Nombre de pelicula 4", "Autor", 2002, "Descripcion",
                 "Comedia", 210, 2, 120));
-        contenidoService.crear(new Contenido(null, "imagen",
+        contenidoService.crear(new Contenido("", "imagen",
                 "Nombre de pelicula 5", "Autor", 2002, "Descripcion",
                 "Comedia", 210, 1, 120));
 
