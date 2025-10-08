@@ -21,4 +21,7 @@ public interface ContenidoService {
     Page<Contenido> recuperarPorNombreDeAutores(String nombre, int nroPagina, int tamanioPorPagina);
     void escribirReview(Long contenidoId, Long usuarioId, String text);
     void eliminarReview(Long contenidoId, Long usuarioId);
+
+    Page<Contenido> recuperarPorNombreSoloLibros(String nombre, int nroPagina, int tamanioPorPagina);
+    Page<Contenido> recuperarPorNombreSoloPeliculas(String nombre, int nroPagina, int tamanioPorPagina);
 }
