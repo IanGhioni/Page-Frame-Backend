@@ -94,4 +94,15 @@ public class ContenidoControllerREST {
         PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
         return pDTO;
     }
+
+    @PutMapping("/escribirReview/{contenidoId}/{usuarioId}")
+    public void editarTextoReview(@PathVariable Long contenidoId, @PathVariable Long usuarioId, @RequestBody TextoReviewDTO textoDTO) {
+        contenidoService.editarTextoReview(contenidoId, usuarioId, textoDTO.text());
+    }
+
+    @GetMapping("/getReview/{contenidoId}/{usuarioId}")
+    public TextoReviewDTO getTextoReview(@PathVariable Long contenidoId, @PathVariable Long usuarioId) {
+        String texto = contenidoService.getTextoReview(contenidoId, usuarioId);
+        return new TextoReviewDTO(texto);
+    }
 }

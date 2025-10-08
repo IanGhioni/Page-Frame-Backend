@@ -478,6 +478,33 @@ public class ContenidoServiceTest {
         assertNull(contenidoRecuperado2.getReviews().getFirst().getHora());
     }
 
+    @Test
+    void testEditarTextoReview() {
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, usuario.getId());
+        contenidoService.escribirReview(velocipastor.getId(), usuario.getId(), "Mejor pelicula de la historia");
+
+        contenidoService.editarTextoReview(velocipastor.getId(), usuario.getId(), "Pelicula aceptable");
+        var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+
+        assertEquals(contenidoRecuperado.getReviews().getFirst().getTexto(), "Pelicula aceptable");
+    }
+
+    @Test
+    void testEditarTextoReviewConTextoVacío() {
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, usuario.getId());
+        contenidoService.escribirReview(velocipastor.getId(), usuario.getId(), "Mejor pelicula de la historia");
+
+        assertThrows(CuerpoDeReviewInvalido.class, () -> contenidoService.editarTextoReview(velocipastor.getId(), usuario.getId(), ""));
+    }
+
+    @Test
+    void testEditarTextoReviewConTextoEspacio() {
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, usuario.getId());
+        contenidoService.escribirReview(velocipastor.getId(), usuario.getId(), "Mejor pelicula de la historia");
+
+        assertThrows(CuerpoDeReviewInvalido.class, () -> contenidoService.editarTextoReview(velocipastor.getId(), usuario.getId(), " "));
+    }
+
     @AfterEach
     void cleanUp() {
         testService.cleanUp();
