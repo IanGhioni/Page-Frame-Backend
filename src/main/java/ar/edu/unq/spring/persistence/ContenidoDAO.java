@@ -91,7 +91,7 @@ public interface ContenidoDAO extends JpaRepository<Contenido, Long> {
             countQuery = """
         select count(*)
         from contenido c
-        where c.titulo ilike '%' || :name || '%'
+        where c.titulo ilike '%' || :name || '%' and c.isbn is not null and c.isbn != ''
         """,
             nativeQuery = true
     )
@@ -115,7 +115,7 @@ public interface ContenidoDAO extends JpaRepository<Contenido, Long> {
             countQuery = """
         select count(*)
         from contenido c
-        where c.titulo ilike '%' || :name || '%'
+        where c.titulo ilike '%' || :name || '%' and c.isbn = ''
         """,
             nativeQuery = true
     )
