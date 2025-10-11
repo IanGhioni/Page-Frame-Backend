@@ -173,4 +173,24 @@ public class ContenidoServiceImpl implements ContenidoService {
 
         return page;
     }
+
+    @Override
+    public Page<Contenido> recuperarPorAutorSoloLibros(String autor, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("autores").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByAutorOnlyBooks(autor, p);
+
+        return page;
+    }
+
+    @Override
+    public Page<Contenido> recuperarPorAutorSoloPeliculas(String autor, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("autores").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByAutorOnlyMovies(autor, p);
+
+        return page;
+    }
 }

@@ -120,9 +120,52 @@ public interface ContenidoDAO extends JpaRepository<Contenido, Long> {
             nativeQuery = true
     )
     Page<Contenido> findByTituloOnlyMovies(@Param("name") String titulo, Pageable pageable);
+
+    @Query(
+            value = """
+        select *
+        from contenido c
+        where c.autores ilike '%' || :name || '%' and c.isbn is not null and c.isbn != ''
+        order by 
+          (case
+            when c.titulo ilike :name then 1
+            when c.titulo ilike :name || '%' then 2
+            when c.titulo ilike '% ' || :name || ' %' then 3
+            when c.titulo ilike '%' || :name || '%' then 4
+            else 5
+          end),
+          c.rating_count desc
+        """,
+            countQuery = """
+        select count(*)
+        from contenido c
+        where c.autores ilike '%' || :name || '%' and c.isbn is not null and c.isbn != ''
+        """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByAutorOnlyBooks(@Param("name") String titulo, Pageable pageable);
+
+    @Query(
+            value = """
+        select *
+        from contenido c
+        where c.autores ilike '%' || :name || '%' and c.isbn = ''
+        order by 
+          (case
+            when c.titulo ilike :name then 1
+            when c.titulo ilike :name || '%' then 2
+            when c.titulo ilike '% ' || :name || ' %' then 3
+            when c.titulo ilike '%' || :name || '%' then 4
+            else 5
+          end),
+          c.rating_count desc
+        """,
+            countQuery = """
+        select count(*)
+        from contenido c
+        where c.autores ilike '%' || :name || '%' and c.isbn = ''
+        """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByAutorOnlyMovies(@Param("name") String titulo, Pageable pageable);
 }
-/*
-
-
-
-* */
