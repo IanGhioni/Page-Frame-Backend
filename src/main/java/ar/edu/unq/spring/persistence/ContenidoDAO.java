@@ -128,10 +128,10 @@ public interface ContenidoDAO extends JpaRepository<Contenido, Long> {
         where c.autores ilike '%' || :name || '%' and c.isbn is not null and c.isbn != ''
         order by 
           (case
-            when c.titulo ilike :name then 1
-            when c.titulo ilike :name || '%' then 2
-            when c.titulo ilike '% ' || :name || ' %' then 3
-            when c.titulo ilike '%' || :name || '%' then 4
+            when c.autores ilike :name then 1
+            when c.autores ilike :name || '%' then 2
+            when c.autores ilike '% ' || :name || ' %' then 3
+            when c.autores ilike '%' || :name || '%' then 4
             else 5
           end),
           c.rating_count desc
@@ -152,10 +152,10 @@ public interface ContenidoDAO extends JpaRepository<Contenido, Long> {
         where c.autores ilike '%' || :name || '%' and c.isbn = ''
         order by 
           (case
-            when c.titulo ilike :name then 1
-            when c.titulo ilike :name || '%' then 2
-            when c.titulo ilike '% ' || :name || ' %' then 3
-            when c.titulo ilike '%' || :name || '%' then 4
+            when c.autores ilike :name then 1
+            when c.autores ilike :name || '%' then 2
+            when c.autores ilike '% ' || :name || ' %' then 3
+            when c.autores ilike '%' || :name || '%' then 4
             else 5
           end),
           c.rating_count desc
