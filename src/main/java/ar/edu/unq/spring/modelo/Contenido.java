@@ -137,4 +137,12 @@ public class Contenido {
                     review.setHora(null);
                 });
     }
+
+    public String getTextoReview(Usuario usuario) {
+        return this.reviews.stream()
+                .filter(review -> review.getUsuario().getId().equals(usuario.getId()))
+                .findFirst()
+                .map(Review::getTexto)
+                .orElse(null);
+    }
 }

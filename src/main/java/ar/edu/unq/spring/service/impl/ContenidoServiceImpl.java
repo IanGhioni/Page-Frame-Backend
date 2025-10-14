@@ -157,6 +157,30 @@ public class ContenidoServiceImpl implements ContenidoService {
     }
 
     @Override
+    public void editarTextoReview(Long contenidoId, Long usuarioId, String nuevoTexto) {
+        Contenido contenido = this.contenidoDAO.findById(contenidoId)
+                .orElseThrow(ContenidoNoEncontradoException::new);
+        Usuario usuario = this.usuarioService.recuperar(usuarioId);
+        if (nuevoTexto == null || nuevoTexto.isBlank()) {
+            throw new CuerpoDeReviewInvalido();
+        }
+
+        contenido.agregarOActualizarReview(usuario, nuevoTexto);
+
+        this.contenidoDAO.save(contenido);
+    }
+
+    @Override
+    public String getTextoReview(Long contenidoId, Long usuarioId) {
+        Contenido contenido = this.contenidoDAO.findById(contenidoId)
+                .orElseThrow(ContenidoNoEncontradoException::new);
+
+        Usuario usuario = this.usuarioService.recuperar(usuarioId);
+
+        return contenido.getTextoReview(usuario);
+    }
+  
+    @Override
     public Page<Contenido> recuperarPorNombreSoloLibros(String nombre, int nroPagina, int tamanioPorPagina) {
         this.validarPaginacion(nroPagina, tamanioPorPagina);
         PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("titulo").ascending());

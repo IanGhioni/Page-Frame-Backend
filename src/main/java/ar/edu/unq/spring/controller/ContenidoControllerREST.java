@@ -95,6 +95,17 @@ public class ContenidoControllerREST {
         return pDTO;
     }
 
+    @PutMapping("/escribirReview/{contenidoId}/{usuarioId}")
+    public void editarTextoReview(@PathVariable Long contenidoId, @PathVariable Long usuarioId, @RequestBody TextoReviewDTO textoDTO) {
+        contenidoService.editarTextoReview(contenidoId, usuarioId, textoDTO.text());
+    }
+
+    @GetMapping("/getReview/{contenidoId}/{usuarioId}")
+    public TextoReviewDTO getTextoReview(@PathVariable Long contenidoId, @PathVariable Long usuarioId) {
+        String texto = contenidoService.getTextoReview(contenidoId, usuarioId);
+        return new TextoReviewDTO(texto);
+    }
+  
     @GetMapping("/search/libros")
     public PageContenidoDTO searchContenidoCategoriaLibros(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
         Page<Contenido> p = contenidoService.recuperarPorNombreSoloLibros(nombre, nroPagina, tamanioPagina);
