@@ -1,5 +1,6 @@
 package ar.edu.unq.spring.modelo;
 
+import ar.edu.unq.spring.controller.dto.ContenidoDeUsuarioPersonalizadoSimpleResponseDTO;
 import ar.edu.unq.spring.controller.dto.ListaPersonalizadaDTO;
 import ar.edu.unq.spring.jwt.JWTRole;
 import jakarta.persistence.*;

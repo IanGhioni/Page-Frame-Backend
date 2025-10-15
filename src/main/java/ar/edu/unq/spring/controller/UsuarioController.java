@@ -60,8 +60,9 @@ public class UsuarioController {
     }
 
     @GetMapping("/{idUser}/getListaPersonalizada/{nombreLista}")
-    public ContenidoDeUsuarioPersonalizado getListaPersonalizada(@PathVariable Long idUser, @PathVariable String nombreLista) {
-        return usuarioService.getListaPersonalizada(idUser, nombreLista);
+    public ContenidoDeUsuarioPersonalizadoSimpleResponseDTO getListaPersonalizada(@PathVariable Long idUser, @PathVariable String nombreLista) {
+        ContenidoDeUsuarioPersonalizado lista = usuarioService.getListaPersonalizada(idUser, nombreLista);
+        return ContenidoDeUsuarioPersonalizadoSimpleResponseDTO.fromModel(lista);
     }
 
     @PostMapping("/{idUser}/agregar/{idContenido}/aListaPersonalizada/{nombreLista}")

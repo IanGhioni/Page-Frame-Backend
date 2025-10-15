@@ -1,5 +1,6 @@
 package ar.edu.unq.spring.service.impl;
 
+import ar.edu.unq.spring.controller.dto.ContenidoDeUsuarioPersonalizadoSimpleResponseDTO;
 import ar.edu.unq.spring.controller.dto.ListaPersonalizadaDTO;
 import ar.edu.unq.spring.exception.ContenidoNoEncontradoException;
 import ar.edu.unq.spring.exception.ListaExistenteException;

@@ -1,6 +1,5 @@
 package ar.edu.unq.spring.service.interfaces;
 
-import ar.edu.unq.spring.controller.dto.ListaPersonalizadaDTO;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuario;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuarioPersonalizado;
