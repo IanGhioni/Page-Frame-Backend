@@ -1,5 +1,6 @@
 package ar.edu.unq.spring.service.interfaces;
 
+import ar.edu.unq.spring.controller.dto.ListaPersonalizadaDTO;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuario;
 import ar.edu.unq.spring.modelo.ContenidoDeUsuarioPersonalizado;
@@ -23,4 +24,5 @@ public interface UsuarioService {
     Set<ContenidoDeUsuarioPersonalizado> getListasPersonalizadasDeUsuario(Long usuarioId);
     void eliminarListaPersonalizada(Long usuarioId, String nombre);
     void eliminarContenidoDeListaPersonalizada(Long usuarioId, Long contenidoId, String nombre);
+    ContenidoDeUsuarioPersonalizado getListaPersonalizada(Long idUser, String nombreLista);
 }
