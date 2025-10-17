@@ -59,6 +59,12 @@ public class UsuarioController {
         usuarioService.crearListaPersonalizada(idUser, lista.nombre(), lista.descripcion());
     }
 
+    @GetMapping("/{idUser}/getListaPersonalizada/{nombreLista}")
+    public ContenidoDeUsuarioPersonalizadoSimpleResponseDTO getListaPersonalizada(@PathVariable Long idUser, @PathVariable String nombreLista) {
+        ContenidoDeUsuarioPersonalizado lista = usuarioService.getListaPersonalizada(idUser, nombreLista);
+        return ContenidoDeUsuarioPersonalizadoSimpleResponseDTO.fromModel(lista);
+    }
+
     @PostMapping("/{idUser}/agregar/{idContenido}/aListaPersonalizada/{nombreLista}")
     public void agregarContenidoAListaPersonalizada(@PathVariable Long idUser, @PathVariable Long idContenido, @PathVariable String nombreLista) {
         usuarioService.agregarContenidoAListaPersonalizada(idUser, idContenido, nombreLista);

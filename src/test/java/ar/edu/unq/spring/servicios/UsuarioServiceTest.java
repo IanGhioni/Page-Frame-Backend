@@ -261,6 +261,17 @@ public class UsuarioServiceTest {
         assertEquals(1, lista2.size());
     }
 
+    @Test
+    void testgetListaMeTraeEsaLista(){
+        Usuario orne = new Usuario("orne439", "orne439@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        usuarioService.crearListaPersonalizada(ornePers.getId(), "favs", "libros y pelis que cambiaron mi vida");
+        ContenidoDeUsuarioPersonalizado lista = usuarioService.getListaPersonalizada(ornePers.getId(), "favs");
+        assertEquals("favs", lista.getNombre());
+        assertEquals("libros y pelis que cambiaron mi vida", lista.getDescripcion());
+    }
+
     @AfterEach
         void clean () {
             testService.cleanUp();

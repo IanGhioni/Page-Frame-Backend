@@ -1,5 +1,7 @@
 package ar.edu.unq.spring.modelo;
 
+import ar.edu.unq.spring.controller.dto.ContenidoDeUsuarioPersonalizadoSimpleResponseDTO;
+import ar.edu.unq.spring.controller.dto.ListaPersonalizadaDTO;
 import ar.edu.unq.spring.jwt.JWTRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -92,6 +94,11 @@ public class Usuario implements UserDetails {
     public boolean yaExisteListaDeNombre(String nombre) {
         ContenidoDeUsuarioPersonalizado lista = this.listasPersonalizadas.stream().filter(cdup -> cdup.getNombre().equals(nombre)).findFirst().orElse(null);
         return (lista != null);
+    }
+
+    public ContenidoDeUsuarioPersonalizado getLista(String nombre) {
+        ContenidoDeUsuarioPersonalizado lista = this.listasPersonalizadas.stream().filter(cdup -> cdup.getNombre().equals(nombre)).findFirst().orElse(null);
+        return lista;
     }
 
     //Metodos de la interfaz UserDetailes aca debajo (No tocar por favorcito)
