@@ -614,8 +614,53 @@ public class ContenidoServiceTest {
         Assertions.assertTrue(p1.isEmpty());
     }
 
-    @AfterEach
-    void cleanUp() {
-        testService.cleanUp();
+    @Test
+    public void buscarContenidoPorGenero() {
+        Contenido madagascar = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar", "Eric Darnell, Tom McGrath", 2005, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 465000, 6.9, 86);
+        contenidoService.crear(madagascar);
+
+        Page<Contenido> contenido = contenidoService.recuperarPorGenero("Comedy", 0, 3);
+
+        Assertions.assertTrue(
+                contenido.getContent().stream()
+                        .anyMatch(c -> c.getTitulo().equalsIgnoreCase("Velocipastor"))
+        );
+
+        Assertions.assertTrue(
+                contenido.getContent().stream()
+                        .anyMatch(c -> c.getTitulo().equalsIgnoreCase("Madagascar"))
+        );
+        Assertions.assertEquals(2, contenido.getTotalElements());
     }
-}
+
+    @Test
+    public void buscarContenidoPorGeneroSoloPeliculas() {
+        Page<Contenido> contenido = contenidoService.recuperarPorGeneroSoloPeliculas("Comedy", 0, 3);
+
+        Assertions.assertTrue(
+                contenido.getContent().stream()
+                        .anyMatch(c -> c.getTitulo().equalsIgnoreCase("Velocipastor"))
+        );
+
+        Assertions.assertEquals(1, contenido.getTotalElements());
+    }
+
+    @Test
+    public void buscarContenidoPorGeneroSoloLibros() {
+        Page<Contenido> contenido = contenidoService.recuperarPorGeneroSoloLibros("Adventure", 0, 3);
+
+        Assertions.assertTrue(
+                contenido.getContent().stream()
+                        .anyMatch(c -> c.getTitulo().equalsIgnoreCase("Percy Jackson & the Olympians: The Lightning Thief"))
+        );
+
+        Assertions.assertEquals(1, contenido.getTotalElements());
+    }
+
+        @AfterEach
+        void cleanUp () {
+            testService.cleanUp();
+        }
+    }

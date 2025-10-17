@@ -133,4 +133,25 @@ public class ContenidoControllerREST {
         PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
         return pDTO;
     }
+
+    @GetMapping("/searchPorGenero")
+    public PageContenidoDTO searchPorGenero(@RequestParam String categoria, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorGenero(categoria, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
+
+    @GetMapping("/searchPorGenero/libros")
+    public PageContenidoDTO searchPorGeneroSoloLibros(@RequestParam String categoria, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorGeneroSoloLibros(categoria, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
+
+    @GetMapping("/searchPorGenero/peliculas")
+    public PageContenidoDTO searchPorGeneroSoloPeliculas(@RequestParam String categoria, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorGeneroSoloPeliculas(categoria, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
 }
