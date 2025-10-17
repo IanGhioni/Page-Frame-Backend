@@ -28,4 +28,8 @@ public interface ContenidoService {
     Page<Contenido> recuperarPorNombreSoloPeliculas(String nombre, int nroPagina, int tamanioPorPagina);
     Page<Contenido> recuperarPorAutorSoloLibros(String autor, int nroPagina, int tamanioPorPagina);
     Page<Contenido> recuperarPorAutorSoloPeliculas(String autor, int nroPagina, int tamanioPorPagina);
+
+    Page<Contenido> recuperarPorGenero(String genero, int nroPagina, int tamanioPorPagina);
+    Page<Contenido> recuperarPorGeneroSoloLibros(String genero, int nroPagina, int tamanioPorPagina);
+    Page<Contenido> recuperarPorGeneroSoloPeliculas(String genero, int nroPagina, int tamanioPorPagina);
 }

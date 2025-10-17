@@ -217,4 +217,28 @@ public class ContenidoServiceImpl implements ContenidoService {
 
         return page;
     }
+
+    public Page<Contenido> recuperarPorGenero(String categoria, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("categoria").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByGeneroOrderByRatingCountDesc(categoria, p);
+
+        return page;
+    }
+
+    public Page<Contenido> recuperarPorGeneroSoloLibros(String categoria, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("categoria").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByGeneroOnlyBooksOrderByRatingCountDesc(categoria, p);
+
+        return page;
+    }
+
+    public Page<Contenido> recuperarPorGeneroSoloPeliculas(String categoria, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("categoria").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByGeneroOnlyMoviesOrderByRatingCountDesc(categoria, p);
+
+        return page;
+    }
 }
