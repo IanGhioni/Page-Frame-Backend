@@ -27,4 +27,17 @@ public record ContenidoBodyDTO (String isbn,
                     contenidoBodyDTO.largo
             );
         }
+
+        public static ContenidoBodyDTO fromModel(Contenido contenido) {
+            return new ContenidoBodyDTO(
+                    contenido.getIsbn(),
+                    contenido.getImagen(),
+                    contenido.getTitulo(),
+                    contenido.getAutores(),
+                    contenido.getPublicacion(),
+                    contenido.getDescripcion(),
+                    contenido.getCategoria(),
+                    contenido.getLargo()
+            );
+        }
 }

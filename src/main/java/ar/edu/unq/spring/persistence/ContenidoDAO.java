@@ -20,8 +20,29 @@ public interface ContenidoDAO extends JpaRepository<Contenido, Long> {
     @Query("from Contenido c order by c.autores ASC")
     List<Contenido> contenidoOrdPorAutoresAsc();
 
-//    @Query("from Contenido c where c.titulo ilike %:name% order by c.ratingCount desc ")
-//    Page<Contenido> findByTituloContaining(@Param("name") String titulo, Pageable pageable);
+    @Query(
+            value = """
+        select *
+        from contenido c
+        where c.autores ilike '%' || :name || '%'
+        order by 
+          (case
+            when c.autores ilike :name then 1
+            when c.autores ilike :name || '%' then 2
+            when c.autores ilike '% ' || :name || ' %' then 3
+            when c.autores ilike '%' || :name || '%' then 4
+            else 5
+          end),
+          c.rating_count desc
+        """,
+            countQuery = """
+        select count(*)
+        from contenido c
+        where c.autores ilike '%' || :name || '%'
+        """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByAutores(@Param("name") String nombre, Pageable pageable);
 
     @Query(
             value = """
@@ -50,4 +71,154 @@ public interface ContenidoDAO extends JpaRepository<Contenido, Long> {
 
     @Query("from Contenido c order by c.ratingCount desc ")
     Page<Contenido> contenidoOrdPorRatingCount(@Param("name") Pageable pageable);
+
+
+    @Query(
+            value = """
+        select *
+        from contenido c
+        where c.titulo ilike '%' || :name || '%' and c.isbn is not null and c.isbn != ''
+        order by 
+          (case
+            when c.titulo ilike :name then 1
+            when c.titulo ilike :name || '%' then 2
+            when c.titulo ilike '% ' || :name || ' %' then 3
+            when c.titulo ilike '%' || :name || '%' then 4
+            else 5
+          end),
+          c.rating_count desc
+        """,
+            countQuery = """
+        select count(*)
+        from contenido c
+        where c.titulo ilike '%' || :name || '%' and c.isbn is not null and c.isbn != ''
+        """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByTituloOnlyBooks(@Param("name") String titulo, Pageable pageable);
+
+    @Query(
+            value = """
+        select *
+        from contenido c
+        where c.titulo ilike '%' || :name || '%' and c.isbn = ''
+        order by 
+          (case
+            when c.titulo ilike :name then 1
+            when c.titulo ilike :name || '%' then 2
+            when c.titulo ilike '% ' || :name || ' %' then 3
+            when c.titulo ilike '%' || :name || '%' then 4
+            else 5
+          end),
+          c.rating_count desc
+        """,
+            countQuery = """
+        select count(*)
+        from contenido c
+        where c.titulo ilike '%' || :name || '%' and c.isbn = ''
+        """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByTituloOnlyMovies(@Param("name") String titulo, Pageable pageable);
+
+    @Query(
+            value = """
+        select *
+        from contenido c
+        where c.autores ilike '%' || :name || '%' and c.isbn is not null and c.isbn != ''
+        order by 
+          (case
+            when c.autores ilike :name then 1
+            when c.autores ilike :name || '%' then 2
+            when c.autores ilike '% ' || :name || ' %' then 3
+            when c.autores ilike '%' || :name || '%' then 4
+            else 5
+          end),
+          c.rating_count desc
+        """,
+            countQuery = """
+        select count(*)
+        from contenido c
+        where c.autores ilike '%' || :name || '%' and c.isbn is not null and c.isbn != ''
+        """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByAutorOnlyBooks(@Param("name") String titulo, Pageable pageable);
+
+    @Query(
+            value = """
+        select *
+        from contenido c
+        where c.autores ilike '%' || :name || '%' and c.isbn = ''
+        order by 
+          (case
+            when c.autores ilike :name then 1
+            when c.autores ilike :name || '%' then 2
+            when c.autores ilike '% ' || :name || ' %' then 3
+            when c.autores ilike '%' || :name || '%' then 4
+            else 5
+          end),
+          c.rating_count desc
+        """,
+            countQuery = """
+        select count(*)
+        from contenido c
+        where c.autores ilike '%' || :name || '%' and c.isbn = ''
+        """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByAutorOnlyMovies(@Param("name") String titulo, Pageable pageable);
+
+    @Query(
+            value = """
+            select *
+            from contenido c
+            where c.categoria ilike '%' || :categoria || '%' 
+            order by c.rating_count desc
+            """,
+            countQuery = """
+            select count(*)
+            from contenido c
+            where c.categoria ilike '%' || :categoria || '%' 
+            """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByGeneroOrderByRatingCountDesc(@Param("categoria") String categoria, Pageable pageable);
+
+    @Query(
+            value = """
+            select *
+            from contenido c
+            where c.categoria ilike '%' || :categoria || '%' 
+              and c.isbn is null
+            order by c.rating_count desc
+            """,
+            countQuery = """
+            select count(*)
+            from contenido c
+            where c.categoria ilike '%' || :categoria || '%' 
+              and c.isbn is null
+            """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByGeneroOnlyMoviesOrderByRatingCountDesc(@Param("categoria") String categoria, Pageable pageable);
+
+    @Query(
+            value = """
+            select *
+            from contenido c
+            where c.categoria ilike '%' || :categoria || '%' 
+              and c.isbn is not null
+            order by c.rating_count desc
+            """,
+            countQuery = """
+            select count(*)
+            from contenido c
+            where c.categoria ilike '%' || :categoria || '%' 
+              and c.isbn is not null
+            """,
+            nativeQuery = true
+    )
+    Page<Contenido> findByGeneroOnlyBooksOrderByRatingCountDesc(@Param("categoria") String categoria, Pageable pageable);
 }
+

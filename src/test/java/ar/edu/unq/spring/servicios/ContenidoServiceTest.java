@@ -1,16 +1,15 @@
 package ar.edu.unq.spring.servicios;
 
+import ar.edu.unq.spring.exception.*;
 import ar.edu.unq.spring.jwt.JWTRole;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.Usuario;
-import ar.edu.unq.spring.modelo.exception.ContenidoNoEncontradoException;
-import ar.edu.unq.spring.modelo.exception.NroDePaginaInvalidoException;
-import ar.edu.unq.spring.modelo.exception.TamanioDePaginaInvalidoException;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
 import ar.edu.unq.spring.testService.TestService;
 import ar.edu.unq.spring.testService.TestServiceConfig;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,7 @@ public class ContenidoServiceTest {
                 "Science, Environment, Non-fiction", 3072, 4.40, 464);
         contenidoService.crear(climateBook);
 
-        usuario = new Usuario("juan123", "juan@gmail.com", "Juan1235678!!", JWTRole.USER, "pato");
+        usuario = new Usuario("juan123", "juan@gmail.com", "Juan1235678!!", JWTRole.USER, "panda");
         usuarioService.crear(usuario);
         velocipastor = new Contenido(null, "https://m.media-amazon.com/images/I/51e15zlvVDL._AC_SY200_QL15_.jpg",
                 "Velocipastor", "Brendan Steere", 2018, "Un sacerdote obtiene la habilidad de convertirse en dinosaurio y la usa para luchar contra los ninjas traficantes de drogas.",
@@ -287,9 +286,381 @@ public class ContenidoServiceTest {
         assertEquals(0, contenidoRecuperado.getReviews().size());
     }
 
+    @Test
+    void testBuscarPorNombreDeAutoresConUnSoloContenido() {
+        Contenido madagascar = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar", "Eric Darnell, Tom McGrath", 2005, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 465000, 6.9, 86);
+        contenidoService.crear(madagascar);
 
-    @AfterEach
-    void cleanUp() {
-        testService.cleanUp();
+        var pagina =  contenidoService.recuperarPorNombreDeAutores("Eric Darnell", 0, 1);
+        Assertions.assertEquals(1, pagina.getTotalPages());
+        Assertions.assertEquals(1, pagina.get().toList().size());
+        Assertions.assertEquals("Madagascar", pagina.stream().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Eric Darnell, Tom McGrath", pagina.stream().toList().getFirst().getAutores());
     }
-}
+
+    @Test
+    void testBuscarPorNombreDeAutoresConVariosContenidos() {
+        Contenido madagascar = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar", "Eric Darnell, Tom McGrath", 2005, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 465000, 6.9, 86);
+        Contenido madagascar2 = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar 2", "Eric Darnell", 2008, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 300000, 6.9, 86);
+        contenidoService.crear(madagascar);
+        contenidoService.crear(madagascar2);
+
+        var pagina =  contenidoService.recuperarPorNombreDeAutores("Eric Darnell", 0, 2);
+        Assertions.assertEquals(1, pagina.getTotalPages());
+        Assertions.assertEquals(2, pagina.get().toList().size());
+        Assertions.assertEquals("Madagascar 2", pagina.stream().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Eric Darnell", pagina.stream().toList().getFirst().getAutores());
+
+        Assertions.assertEquals("Madagascar", pagina.stream().toList().getLast().getTitulo());
+        Assertions.assertEquals("Eric Darnell, Tom McGrath", pagina.stream().toList().getLast().getAutores());
+    }
+
+    @Test
+    void testBuscarPorNombreDeAutoresArrojaErrorAlBuscarConPaginaMenorA0() {
+        assertThrows(NroDePaginaInvalidoException.class, () -> {
+            contenidoService.recuperarPorNombreDeAutores("Saraza", -1, 5);
+        });
+    }
+
+    @Test
+    void testBuscarPorNombreDeAutoresArrojaErrorAlBuscarConTamanioPaginaMenorA1() {
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> {
+            contenidoService.recuperarPorNombreDeAutores("Saraza", 1, 0);
+        });
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> {
+            contenidoService.recuperarPorNombreDeAutores("Saraza", 1, -1);
+        });
+    }
+
+    @Test
+    void testBuscarPorNombreDeAutoresConVariosContenidosYVariasPaginas() {
+        Contenido madagascar = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar", "Eric Darnell, Tom McGrath", 2005, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 465000, 6.9, 86);
+        Contenido madagascar2 = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar 2", "Eric Darnell", 2008, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 300000, 6.9, 86);
+        contenidoService.crear(madagascar);
+        contenidoService.crear(madagascar2);
+
+        var pagina =  contenidoService.recuperarPorNombreDeAutores("r", 0, 2);
+        var pagina2 =  contenidoService.recuperarPorNombreDeAutores("r", 1, 2);
+        var pagina3 =  contenidoService.recuperarPorNombreDeAutores("r", 2, 2);
+
+        var contenidoPaginaUno  = pagina.get().toList();
+        var contenidoPaginaDos  = pagina2.get().toList();
+        var contenidoPaginaTres = pagina3.get().toList();
+
+
+        Assertions.assertEquals(3, pagina.getTotalPages());
+        Assertions.assertEquals(5, pagina.getTotalElements());
+
+        Assertions.assertEquals(2, contenidoPaginaUno.size());
+        Assertions.assertEquals(2, contenidoPaginaDos.size());
+        Assertions.assertEquals(1, contenidoPaginaTres.size());
+    }
+
+    @Test
+    void buscarPorCreadorSinCoincidenciasRetornaVacio() {
+        var pagina =  contenidoService.recuperarPorNombreDeAutores("RRRRRRR", 0, 10);
+
+        Assertions.assertEquals(0, pagina.getTotalPages());
+        Assertions.assertEquals(0, pagina.getTotalElements());
+        Assertions.assertEquals(0, pagina.get().toList().size());
+    }
+
+    @Test
+    void testNoSePuedeEscribirReviewSiNoEstaValorada() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        assertThrows(ReviewSinValoracion.class, () -> contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), "Prueba"));
+    }
+
+    @Test
+    void testEscribirReviewNoExplotaSiEstaValorada() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, ornePers.getId());
+
+        Assertions.assertDoesNotThrow(() -> contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), "Prueba"));
+    }
+
+    @Test
+    void testNoSePuedeEscribirReviewSinTextoDeReview() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        assertThrows(CuerpoDeReviewInvalido.class, () -> contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), ""));
+    }
+
+    @Test
+    void testUsuarioEscribeReview() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, ornePers.getId());
+        contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), "Prueba");
+        var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+
+        Assertions.assertEquals(1, contenidoRecuperado.getReviews().size());
+        Assertions.assertNotNull(contenidoRecuperado.getReviews().getFirst().getId());
+        Assertions.assertEquals("Prueba", contenidoRecuperado.getReviews().getFirst().getTexto());
+    }
+
+    @Test
+    void testUsuarioEscribeReviewEn2Contenidos() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, ornePers.getId());
+        contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), "Prueba velocipastor");
+        contenidoService.valorarContenido(percyJackson.getId(), 5.0, ornePers.getId());
+        contenidoService.escribirReview(percyJackson.getId(), ornePers.getId(), "Prueba percy");
+
+        var velocipastorRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+        var percyRecuperado = contenidoService.recuperar(percyJackson.getId()).get();
+
+        Assertions.assertEquals(1, velocipastorRecuperado.getReviews().size());
+        Assertions.assertNotNull(velocipastorRecuperado.getReviews().getFirst().getId());
+        Assertions.assertEquals("Prueba velocipastor", velocipastorRecuperado.getReviews().getFirst().getTexto());
+        Assertions.assertEquals(1, percyRecuperado.getReviews().size());
+        Assertions.assertNotNull(percyRecuperado.getReviews().getFirst().getId());
+        Assertions.assertEquals("Prueba percy", percyRecuperado.getReviews().getFirst().getTexto());
+    }
+
+    @Test
+    void test2UsuariosEscribenReview() {
+        Usuario orne = new Usuario("orne", "orne@gmail.com", "Orne1235678!!", JWTRole.USER, "panda");
+        Usuario ornePers = usuarioService.crear(orne);
+
+        Usuario ian = new Usuario("ian", "ian@gmail.com", "Iancho1235678!!", JWTRole.USER, "panda");
+        Usuario ianePers = usuarioService.crear(ian);
+
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, ornePers.getId());
+        contenidoService.escribirReview(velocipastor.getId(), ornePers.getId(), "Prueba Orne");
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, ianePers.getId());
+        contenidoService.escribirReview(velocipastor.getId(), ianePers.getId(), "Prueba Ian");
+
+        var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+
+        Assertions.assertEquals(2, contenidoRecuperado.getReviews().size());
+        Assertions.assertTrue(contenidoRecuperado.getReviews().stream().anyMatch(r -> r.getTexto().equals("Prueba Orne")));
+        Assertions.assertTrue(contenidoRecuperado.getReviews().stream().anyMatch(r -> r.getTexto().equals("Prueba Ian")));
+    }
+
+    @Test
+    void testEliminarReviewPeroNoValoracion() {
+        contenidoService.valorarContenido(velocipastor.getId(), 5.0, usuario.getId());
+        contenidoService.escribirReview(velocipastor.getId(), usuario.getId(), "Mejor pelicula de la historia");
+
+        var contenidoRecuperado = contenidoService.recuperar(velocipastor.getId()).get();
+
+        assertEquals(1, contenidoRecuperado.getReviews().size());
+        assertNotNull(contenidoRecuperado.getReviews().getFirst().getId());
+        assertEquals("Mejor pelicula de la historia", contenidoRecuperado.getReviews().getFirst().getTexto());
+
+        contenidoService.eliminarReview(velocipastor.getId(), usuario.getId());
+
+        var contenidoRecuperado2 = contenidoService.recuperar(velocipastor.getId()).get();
+
+        assertEquals(1, contenidoRecuperado2.getReviews().size());
+        assertNotNull(contenidoRecuperado2.getReviews().getFirst().getId());
+        assertNull(contenidoRecuperado2.getReviews().getFirst().getTexto());
+        assertNull(contenidoRecuperado2.getReviews().getFirst().getFecha());
+        assertNull(contenidoRecuperado2.getReviews().getFirst().getHora());
+    }
+
+    @Test
+    public void buscarPorNombreSoloLibrosNroPaginaInvalidoArrojaException() {
+        assertThrows(NroDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloLibros("Nombre", -1, 10));
+    }
+
+    @Test
+    public void buscarPorNombreSoloPelisNroPaginaInvalidoArrojaException() {
+        assertThrows(NroDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloPeliculas("Nombre", -1, 10));
+    }
+
+    @Test
+    public void buscarPorNombreSoloLibrosTamanioPaginaInvalidoArrojaException() {
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloLibros("Nombre", 0, 0));
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloLibros("Nombre", 0, -1));
+    }
+
+    @Test
+    public void buscarPorNombreSoloPelisTamanioPaginaInvalidoArrojaException() {
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloPeliculas("Nombre", 0, 0));
+        assertThrows(TamanioDePaginaInvalidoException.class, () -> contenidoService.recuperarPorNombreSoloPeliculas("Nombre", 0, -1));
+    }
+
+    @Test void buscarPorNombreSoloLibrosSoloTraeLibros() {
+        contenidoService.crear(new Contenido(null, "imagen",
+                                        "Nombre de pelicula", "Autor", 2002, "Descripcion",
+                                        "Comedia", 210, 4, 120));
+
+        contenidoService.crear(new Contenido("9789505470631", "imagen",
+                "Nombre de libro", "Autor", 2002, "Descripcion",
+                "Terror", 1422, 5, 1000));
+
+        Page<Contenido> p = contenidoService.recuperarPorNombreSoloLibros("Nombre de", 0, 5);
+
+        Assertions.assertEquals(1, p.getTotalElements());
+        Assertions.assertNotNull(p.get().toList().getFirst().getIsbn());
+        Assertions.assertEquals("Nombre de libro", p.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals(1, p.getTotalPages());
+    }
+
+    @Test void buscarPorNombreSoloPeliculasSoloTraePeliculas() {
+        contenidoService.crear(new Contenido("", "imagen",
+                "Nombre de pelicula", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 4, 120));
+
+        contenidoService.crear(new Contenido("9789505470631", "imagen",
+                "Nombre de libro", "Autor", 2002, "Descripcion",
+                "Drama", 1422, 5, 1000));
+
+        Page<Contenido> p = contenidoService.recuperarPorNombreSoloPeliculas("Nombre de", 0, 5);
+
+        Assertions.assertEquals(1, p.getTotalElements());
+        Assertions.assertEquals("",p.get().toList().getFirst().getIsbn());
+        Assertions.assertEquals("Nombre de pelicula", p.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals(1, p.getTotalPages());
+    }
+
+    @Test void buscarPorNombreSoloPeliculasTraeElContenidoPaginado() {
+        contenidoService.crear(new Contenido("", "imagen",
+                "Nombre de pelicula 1", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 5, 120));
+        contenidoService.crear(new Contenido("", "imagen",
+                "Nombre de pelicula 2", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 4, 120));
+        contenidoService.crear(new Contenido("", "imagen",
+                "Nombre de pelicula 3", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 3, 120));
+        contenidoService.crear(new Contenido("", "imagen",
+                "Nombre de pelicula 4", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 2, 120));
+        contenidoService.crear(new Contenido("", "imagen",
+                "Nombre de pelicula 5", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 1, 120));
+
+
+        Page<Contenido> p1 = contenidoService.recuperarPorNombreSoloPeliculas("Nombre de", 0, 3);
+        Page<Contenido> p2 = contenidoService.recuperarPorNombreSoloPeliculas("Nombre de", 1, 3);
+
+
+        Assertions.assertEquals(5, p1.getTotalElements());
+        Assertions.assertEquals("Nombre de pelicula 1", p1.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Nombre de pelicula 2", p1.get().toList().get(1).getTitulo());
+        Assertions.assertEquals("Nombre de pelicula 3", p1.get().toList().get(2).getTitulo());
+        Assertions.assertEquals(5, p2.getTotalElements());
+        Assertions.assertEquals("Nombre de pelicula 4", p2.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Nombre de pelicula 5", p2.get().toList().get(1).getTitulo());
+    }
+
+    @Test void buscarPorNombreSoloLibrosTraeElContenidoPaginado() {
+        contenidoService.crear(new Contenido("9789505470631", "imagen",
+                "Nombre de libro 1", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 5, 120));
+        contenidoService.crear(new Contenido("9789505470632", "imagen",
+                "Nombre de libro 2", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 4, 120));
+        contenidoService.crear(new Contenido("9789505470633", "imagen",
+                "Nombre de libro 3", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 3, 120));
+        contenidoService.crear(new Contenido("9789505470634", "imagen",
+                "Nombre de libro 4", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 2, 120));
+        contenidoService.crear(new Contenido("9789505470635", "imagen",
+                "Nombre de libro 5", "Autor", 2002, "Descripcion",
+                "Comedia", 210, 1, 120));
+
+
+        Page<Contenido> p1 = contenidoService.recuperarPorNombreSoloLibros("Nombre de", 0, 3);
+        Page<Contenido> p2 = contenidoService.recuperarPorNombreSoloLibros("Nombre de", 1, 3);
+
+
+        Assertions.assertEquals(5, p1.getTotalElements());
+        Assertions.assertEquals("Nombre de libro 1", p1.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Nombre de libro 2", p1.get().toList().get(1).getTitulo());
+        Assertions.assertEquals("Nombre de libro 3", p1.get().toList().get(2).getTitulo());
+        Assertions.assertEquals(5, p2.getTotalElements());
+        Assertions.assertEquals("Nombre de libro 4", p2.get().toList().getFirst().getTitulo());
+        Assertions.assertEquals("Nombre de libro 5", p2.get().toList().get(1).getTitulo());
+    }
+
+    @Test
+    public void buscarPorNombreSoloLibrosSinCoincidencias() {
+        Page<Contenido> p1 = contenidoService.recuperarPorNombreSoloLibros("Nombre de libro que no existe", 0, 3);
+
+        Assertions.assertEquals(0, p1.getTotalElements());
+        Assertions.assertEquals(0, p1.getTotalPages());
+        Assertions.assertTrue(p1.isEmpty());
+    }
+
+    @Test
+    public void buscarPorNombreSoloPeliculasSinCoincidencias() {
+        Page<Contenido> p1 = contenidoService.recuperarPorNombreSoloPeliculas("Nombre de peli que no existe", 0, 3);
+
+        Assertions.assertEquals(0, p1.getTotalElements());
+        Assertions.assertEquals(0, p1.getTotalPages());
+        Assertions.assertTrue(p1.isEmpty());
+    }
+
+    @Test
+    public void buscarContenidoPorGenero() {
+        Contenido madagascar = new Contenido(null, "https://static.wikia.nocookie.net/doblaje/images/0/00/MadagascarPoster.png/revision/latest?cb=20200326204410&path-prefix=es",
+                "Madagascar", "Eric Darnell, Tom McGrath", 2005, "Four animal friends get a taste of the wild life when they break out of captivity at the Central Park Zoo and wash ashore on the island of Madagascar.",
+                "Animation, Comedy", 465000, 6.9, 86);
+        contenidoService.crear(madagascar);
+
+        Page<Contenido> contenido = contenidoService.recuperarPorGenero("Comedy", 0, 3);
+
+        Assertions.assertTrue(
+                contenido.getContent().stream()
+                        .anyMatch(c -> c.getTitulo().equalsIgnoreCase("Velocipastor"))
+        );
+
+        Assertions.assertTrue(
+                contenido.getContent().stream()
+                        .anyMatch(c -> c.getTitulo().equalsIgnoreCase("Madagascar"))
+        );
+        Assertions.assertEquals(2, contenido.getTotalElements());
+    }
+
+    @Test
+    public void buscarContenidoPorGeneroSoloPeliculas() {
+        Page<Contenido> contenido = contenidoService.recuperarPorGeneroSoloPeliculas("Comedy", 0, 3);
+
+        Assertions.assertTrue(
+                contenido.getContent().stream()
+                        .anyMatch(c -> c.getTitulo().equalsIgnoreCase("Velocipastor"))
+        );
+
+        Assertions.assertEquals(1, contenido.getTotalElements());
+    }
+
+    @Test
+    public void buscarContenidoPorGeneroSoloLibros() {
+        Page<Contenido> contenido = contenidoService.recuperarPorGeneroSoloLibros("Adventure", 0, 3);
+
+        Assertions.assertTrue(
+                contenido.getContent().stream()
+                        .anyMatch(c -> c.getTitulo().equalsIgnoreCase("Percy Jackson & the Olympians: The Lightning Thief"))
+        );
+
+        Assertions.assertEquals(1, contenido.getTotalElements());
+    }
+
+        @AfterEach
+        void cleanUp () {
+            testService.cleanUp();
+        }
+    }

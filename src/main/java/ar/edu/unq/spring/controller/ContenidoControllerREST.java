@@ -3,8 +3,9 @@ package ar.edu.unq.spring.controller;
 import ar.edu.unq.spring.controller.dto.ContenidoBodyDTO;
 import ar.edu.unq.spring.controller.dto.ContenidoResponseDTO;
 import ar.edu.unq.spring.controller.dto.PageContenidoDTO;
+import ar.edu.unq.spring.controller.dto.TextoReviewDTO;
 import ar.edu.unq.spring.modelo.Contenido;
-import ar.edu.unq.spring.modelo.exception.ContenidoNoEncontradoException;
+import ar.edu.unq.spring.exception.ContenidoNoEncontradoException;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -71,8 +72,86 @@ public class ContenidoControllerREST {
         contenidoService.valorarContenido(contenidoId, valoracion, usuarioId);
     }
 
+    @PostMapping("/escribirReview/{contenidoId}/{usuarioId}")
+    public void escribirReview(@PathVariable Long contenidoId, @PathVariable Long usuarioId, @RequestBody TextoReviewDTO textoDTO) {
+        contenidoService.escribirReview(contenidoId, usuarioId, textoDTO.text());
+    }
+
+
     @DeleteMapping("/{contenidoId}/eliminarValoracion/{usuarioId}")
     public void eliminarValoracion(@PathVariable Long contenidoId, @PathVariable Long usuarioId) {
         contenidoService.eliminarValoracionContenido(contenidoId, usuarioId);
+    }
+
+    @DeleteMapping("/{contenidoId}/eliminarReview/{usuarioId}")
+    public void eliminarReview(@PathVariable Long contenidoId, @PathVariable Long usuarioId) {
+        contenidoService.eliminarReview(contenidoId, usuarioId);
+    }
+
+    @GetMapping("/searchAutores")
+    public PageContenidoDTO searchContenidoPorAutores(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorNombreDeAutores(nombre, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
+
+    @PutMapping("/escribirReview/{contenidoId}/{usuarioId}")
+    public void editarTextoReview(@PathVariable Long contenidoId, @PathVariable Long usuarioId, @RequestBody TextoReviewDTO textoDTO) {
+        contenidoService.editarTextoReview(contenidoId, usuarioId, textoDTO.text());
+    }
+
+    @GetMapping("/getReview/{contenidoId}/{usuarioId}")
+    public TextoReviewDTO getTextoReview(@PathVariable Long contenidoId, @PathVariable Long usuarioId) {
+        String texto = contenidoService.getTextoReview(contenidoId, usuarioId);
+        return new TextoReviewDTO(texto);
+    }
+  
+    @GetMapping("/search/libros")
+    public PageContenidoDTO searchContenidoCategoriaLibros(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorNombreSoloLibros(nombre, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
+
+    @GetMapping("/search/peliculas")
+    public PageContenidoDTO searchContenidoCategoriaPeliculas(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorNombreSoloPeliculas(nombre, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
+
+    @GetMapping("/searchAutores/libros")
+    public PageContenidoDTO searchPorAutorSoloLibros(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorAutorSoloLibros(nombre, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
+
+    @GetMapping("/searchAutores/peliculas")
+    public PageContenidoDTO searchPorAutorSoloPeliculas(@RequestParam String nombre, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorAutorSoloPeliculas(nombre, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
+
+    @GetMapping("/searchPorGenero")
+    public PageContenidoDTO searchPorGenero(@RequestParam String categoria, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorGenero(categoria, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
+
+    @GetMapping("/searchPorGenero/libros")
+    public PageContenidoDTO searchPorGeneroSoloLibros(@RequestParam String categoria, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorGeneroSoloLibros(categoria, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
+    }
+
+    @GetMapping("/searchPorGenero/peliculas")
+    public PageContenidoDTO searchPorGeneroSoloPeliculas(@RequestParam String categoria, @RequestParam int nroPagina, @RequestParam int tamanioPagina) {
+        Page<Contenido> p = contenidoService.recuperarPorGeneroSoloPeliculas(categoria, nroPagina, tamanioPagina);
+        PageContenidoDTO pDTO = PageContenidoDTO.converter(p);
+        return pDTO;
     }
 }

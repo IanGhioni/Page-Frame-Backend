@@ -1,7 +1,7 @@
-package ar.edu.unq.spring.modelo.exception;
+package ar.edu.unq.spring.exception;
 
 public class TamanioDePaginaInvalidoException extends RuntimeException {
     public TamanioDePaginaInvalidoException() {
-        super("Tamaño de pagina invalido.");
+        super("Tamaño de página inválido");
     }
 }

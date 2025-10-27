@@ -1,10 +1,8 @@
 package ar.edu.unq.spring.service.impl;
 
+import ar.edu.unq.spring.exception.*;
 import ar.edu.unq.spring.modelo.Contenido;
 import ar.edu.unq.spring.modelo.Usuario;
-import ar.edu.unq.spring.modelo.exception.ContenidoNoEncontradoException;
-import ar.edu.unq.spring.modelo.exception.NroDePaginaInvalidoException;
-import ar.edu.unq.spring.modelo.exception.TamanioDePaginaInvalidoException;
 import ar.edu.unq.spring.persistence.ContenidoDAO;
 import ar.edu.unq.spring.service.interfaces.ContenidoService;
 import ar.edu.unq.spring.service.interfaces.UsuarioService;
@@ -15,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -71,13 +70,7 @@ public class ContenidoServiceImpl implements ContenidoService {
 
     @Override
     public Page<Contenido> recuperarPorNombre(String nombre, int nroPagina, int tamanioPorPagina) {
-        if (nroPagina < 0) {
-            throw new NroDePaginaInvalidoException();
-        }
-        if (tamanioPorPagina < 1) {
-            throw new TamanioDePaginaInvalidoException();
-        }
-
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
 
         PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("titulo").ascending());
         Page<Contenido> page = this.contenidoDAO.findByTituloContainingRelavance(nombre, p);
@@ -86,13 +79,18 @@ public class ContenidoServiceImpl implements ContenidoService {
     }
 
     @Override
+    public Page<Contenido> recuperarPorNombreDeAutores(String autor, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("autores").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByAutores(autor, p);
+
+        return page;
+    }
+
+    @Override
     public Page<Contenido> explorarContenidoPopular(int nroPagina, int tamanioPorPagina) {
-        if (nroPagina < 0) {
-            throw new NroDePaginaInvalidoException();
-        }
-        if (tamanioPorPagina < 1) {
-            throw new TamanioDePaginaInvalidoException();
-        }
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
 
         PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("ratingCount").descending());
         Page<Contenido> page = this.contenidoDAO.contenidoOrdPorRatingCount(p);
@@ -106,7 +104,25 @@ public class ContenidoServiceImpl implements ContenidoService {
                 .orElseThrow(ContenidoNoEncontradoException::new);
         Usuario usuario = this.usuarioService.recuperar(usuarioId);
 
-        contenido.agregarOActualizarReview(usuario, valoracion);
+        contenido.agregarOActualizarValoracion(usuario, valoracion);
+        this.contenidoDAO.save(contenido);
+    }
+
+    @Override
+    public void escribirReview(Long contenidoId, Long usuarioId, String texto) {
+        if (texto == null || texto.isEmpty()) {
+            throw new CuerpoDeReviewInvalido();
+        }
+
+        Contenido contenido = this.contenidoDAO.findById(contenidoId)
+                .orElseThrow(ContenidoNoEncontradoException::new);
+        Usuario usuario = this.usuarioService.recuperar(usuarioId);
+
+        try {
+            contenido.agregarOActualizarReview(usuario, texto);
+        } catch (NoSuchElementException e) {
+            throw new ReviewSinValoracion();
+        }
         this.contenidoDAO.save(contenido);
     }
 
@@ -115,8 +131,114 @@ public class ContenidoServiceImpl implements ContenidoService {
         Contenido contenido = this.contenidoDAO.findById(contenidoId
         ).orElseThrow(ContenidoNoEncontradoException::new);
         Usuario usuario = this.usuarioService.recuperar(usuarioId);
-        contenido.eliminarReview(usuario);
+        contenido.eliminarValoracion(usuario);
         this.contenidoDAO.save(contenido);
 
+    }
+
+    public void validarPaginacion(int nroPagina, int tamanioPorPagina) {
+        if (nroPagina < 0) {
+            throw new NroDePaginaInvalidoException();
+        }
+        if (tamanioPorPagina < 1) {
+            throw new TamanioDePaginaInvalidoException();
+        }
+    }
+
+    @Override
+    public void eliminarReview(Long contenidoId, Long usuarioId) {
+        Contenido contenido = this.contenidoDAO.findById(contenidoId)
+                .orElseThrow(ContenidoNoEncontradoException::new);
+        Usuario usuario = this.usuarioService.recuperar(usuarioId);
+
+       contenido.eliminarTextoReview(usuario);
+
+        this.contenidoDAO.save(contenido);
+    }
+
+    @Override
+    public void editarTextoReview(Long contenidoId, Long usuarioId, String nuevoTexto) {
+        Contenido contenido = this.contenidoDAO.findById(contenidoId)
+                .orElseThrow(ContenidoNoEncontradoException::new);
+        Usuario usuario = this.usuarioService.recuperar(usuarioId);
+        if (nuevoTexto == null || nuevoTexto.isBlank()) {
+            throw new CuerpoDeReviewInvalido();
+        }
+
+        contenido.agregarOActualizarReview(usuario, nuevoTexto);
+
+        this.contenidoDAO.save(contenido);
+    }
+
+    @Override
+    public String getTextoReview(Long contenidoId, Long usuarioId) {
+        Contenido contenido = this.contenidoDAO.findById(contenidoId)
+                .orElseThrow(ContenidoNoEncontradoException::new);
+
+        Usuario usuario = this.usuarioService.recuperar(usuarioId);
+
+        return contenido.getTextoReview(usuario);
+    }
+  
+    @Override
+    public Page<Contenido> recuperarPorNombreSoloLibros(String nombre, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("titulo").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByTituloOnlyBooks(nombre, p);
+
+        return page;
+    }
+
+    @Override
+    public Page<Contenido> recuperarPorNombreSoloPeliculas(String nombre, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("titulo").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByTituloOnlyMovies(nombre, p);
+
+        return page;
+    }
+
+    @Override
+    public Page<Contenido> recuperarPorAutorSoloLibros(String autor, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("autores").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByAutorOnlyBooks(autor, p);
+
+        return page;
+    }
+
+    @Override
+    public Page<Contenido> recuperarPorAutorSoloPeliculas(String autor, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("autores").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByAutorOnlyMovies(autor, p);
+
+        return page;
+    }
+
+    public Page<Contenido> recuperarPorGenero(String categoria, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("categoria").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByGeneroOrderByRatingCountDesc(categoria, p);
+
+        return page;
+    }
+
+    public Page<Contenido> recuperarPorGeneroSoloLibros(String categoria, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("categoria").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByGeneroOnlyBooksOrderByRatingCountDesc(categoria, p);
+
+        return page;
+    }
+
+    public Page<Contenido> recuperarPorGeneroSoloPeliculas(String categoria, int nroPagina, int tamanioPorPagina) {
+        this.validarPaginacion(nroPagina, tamanioPorPagina);
+        PageRequest p = PageRequest.of(nroPagina, tamanioPorPagina, Sort.by("categoria").ascending());
+        Page<Contenido> page = this.contenidoDAO.findByGeneroOnlyMoviesOrderByRatingCountDesc(categoria, p);
+
+        return page;
     }
 }

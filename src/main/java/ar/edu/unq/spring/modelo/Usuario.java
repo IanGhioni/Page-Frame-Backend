@@ -1,5 +1,7 @@
 package ar.edu.unq.spring.modelo;
 
+import ar.edu.unq.spring.controller.dto.ContenidoDeUsuarioPersonalizadoSimpleResponseDTO;
+import ar.edu.unq.spring.controller.dto.ListaPersonalizadaDTO;
 import ar.edu.unq.spring.jwt.JWTRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,9 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @ToString
 @Setter
@@ -38,6 +38,9 @@ public class Usuario implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<ContenidoDeUsuario> misContenidos = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private Set<ContenidoDeUsuarioPersonalizado> listasPersonalizadas;
+
     private String fotoPerfil;
 
     private JWTRole rol;
@@ -48,6 +51,7 @@ public class Usuario implements UserDetails {
             this.password = password;
             this.rol = rol;
             this.fotoPerfil = fotoPerfil;
+            this.listasPersonalizadas = new HashSet<>();
         }
 
 
@@ -67,6 +71,34 @@ public class Usuario implements UserDetails {
 
     public void eliminarContenido(Contenido contenido) {
         this.misContenidos.removeIf(cdu -> cdu.getContenido().getId().equals(contenido.getId()));
+    }
+
+    public void agregarListaPersonalizada(String nombre, String descripcion) {
+        ContenidoDeUsuarioPersonalizado nuevaLista = new ContenidoDeUsuarioPersonalizado(this, nombre, descripcion, new HashSet<>());
+        this.listasPersonalizadas.add(nuevaLista);
+    }
+
+    public void agregarContenidoAListaPersonalizada(ContenidoDeUsuarioPersonalizado lista, Contenido contenido) {
+            lista.getContenido().add(contenido);
+    }
+
+    public void eliminarContenidoDeLista(Contenido contenido, Set<Contenido> contenidoDeUsuarioPersonalizado) {
+            contenidoDeUsuarioPersonalizado.remove(contenido);
+    }
+
+    public void eliminarListaPersonalizada(String nombre) {
+            ContenidoDeUsuarioPersonalizado lista = this.listasPersonalizadas.stream().filter(cdup -> cdup.getNombre().equals(nombre)).findFirst().orElse(null);
+            listasPersonalizadas.remove(lista);
+    }
+
+    public boolean yaExisteListaDeNombre(String nombre) {
+        ContenidoDeUsuarioPersonalizado lista = this.listasPersonalizadas.stream().filter(cdup -> cdup.getNombre().equals(nombre)).findFirst().orElse(null);
+        return (lista != null);
+    }
+
+    public ContenidoDeUsuarioPersonalizado getLista(String nombre) {
+        ContenidoDeUsuarioPersonalizado lista = this.listasPersonalizadas.stream().filter(cdup -> cdup.getNombre().equals(nombre)).findFirst().orElse(null);
+        return lista;
     }
 
     //Metodos de la interfaz UserDetailes aca debajo (No tocar por favorcito)
@@ -99,4 +131,5 @@ public class Usuario implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
